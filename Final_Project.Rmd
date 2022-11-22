@@ -29,6 +29,7 @@ if (!file.exists("https://raw.githubusercontent.com/CBSC73/PM566-Final_Project/m
                 "Vaccination_Coverage_dataset.txt", method="libcurl", timeout = 60)  
 }
 
+#Create data table, remove last two columns as will not use these
 vax <- data.table::fread("Vaccination_Coverage_dataset.txt", stringsAsFactors = F, data.table=getOption("datatable.fread.datatable", TRUE), drop=8:9)  
 ```
 
@@ -45,15 +46,194 @@ head(vax)
 vax <- rename(vax, Year="Survey Year/Influenza Season", Percent_Vax="Estimate (%)",Age_Ethn="Dimension Type", Geog_Type="Geography Type")
 
 
-#Select Influenza data only, remove District of Columbia and City of New York/Rest of state (50 states only)
+#Select Influenza data only, remove District of Columbia and City of New York/Rest of state (regular states only) to use for Chloropleth map
 vaxdf<- as.data.frame(vax)
 vaxtrim <-vaxdf %>% filter(Vaccine=="Influenza", Geography!="District of Columbia", Geography!="NY-City of New York", Geography!="NY-Rest of state", Geography!="Puerto Rico", Geography!="United States")
 
 
+#Rename Geography column to "state" for the map
+vaxtrim <- rename(vaxtrim, state=Geography)
 
-unique(vaxtrim$Geography)
-#There are only 46 states available in the dataset. Missing states are: Arizona, California, Idaho, South Carolina.
+
+#Make percent vax numeric
+vaxtrim$Percent_Vax<-as.numeric(as.character(vaxtrim$Percent_Vax))
+```
+```{r, create 2012 and 2019 datasets, include=FALSE}
+
+#Create datasets 
+vaxtrim2012<-vaxtrim %>% filter(Year=="2012", Dimension=="≥18 Years")
+unique(vaxtrim2012$Year)
+
+vaxtrim2019<-vaxtrim %>% filter(Year=="2019", Dimension=="≥18 Years")
+unique(vaxtrim2019$Year)
+
+
+#Check each dataset for NA values
+colSums(is.na(vaxtrim2012))
+colSums(is.na(vaxtrim2019))
+#There are no missing values in the datasets 
+
+#Remove duplicates
+vaxtrim2012<-distinct(vaxtrim2012)
+vaxtrim2019<-distinct(vaxtrim2019)
+
+view(vaxtrim2012)#Only 29 states included
+view(vaxtrim2019)#Only 40 states included
+
+unique(vaxtrim2012$Percent_Vax)
+
+
+vaxtrim2020<-vaxtrim %>% filter(Year=="2020", Dimension=="≥18 Years")
+unique(vaxtrim2020$state)
 ```
 
+
+```{r, chloropleth set up, include=FALSE}
+
+view(state.abb)
+view(state.name)
+library(dplyr)
+
+st_crosswalk <- tibble(state = state.name) %>%
+   bind_cols(tibble(abb = state.abb))
+
+vaxtrim2012 <- left_join(vaxtrim2012, st_crosswalk, by = "state")
+vaxtrim2019 <- left_join(vaxtrim2019, st_crosswalk, by = "state")
+
+#Create hover text
+vaxtrim2012$hover<-with(vaxtrim2012, paste(state, '<br>', "Vaccination Rate(%):", Percent_Vax))
+vaxtrim2019$hover<-with(vaxtrim2019, paste(state, '<br>', "Vaccination Rate(%):", Percent_Vax))
+
+# Set up mapping details
+set_map_details<- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+
+```
+```{r, include=FALSE}
+#Create map 2012
+fig2012<-plot_geo(vaxtrim2012, locationmode = 'USA-states') %>% 
+  add_trace(
+    z = ~Percent_Vax, 
+    text = ~hover, 
+    locations = ~abb,
+    color = ~Percent_Vax, 
+    colors = 'Greens'
+  )
+fig2012 <- fig2012 %>% colorbar(title = "Vaccination Rate (%)", limits = c(20,90))
+fig2012 <- fig2012 %>% layout(title = paste('Influenza Vaccination Rate During Pregnancy by State, 2012'),
+    geo = set_map_details)
+
+fig2012
+```
+
+
+```{r, include=FALSE}
+#Create map 2019
+fig2019<-plot_geo(vaxtrim2019, locationmode = 'USA-states') %>% 
+  add_trace(
+    z = ~Percent_Vax, 
+    text = ~hover, 
+    locations = ~abb,
+    color = ~Percent_Vax, 
+    colors = 'Greens',
+    showscale = FALSE
+  )
+fig2019 <- fig2019 %>% colorbar(limits = c(20,90)) #Make sure limits are same for both maps
+fig2019 <- fig2019 %>% layout(title = paste('Influenza Vaccination Rate During Pregnancy by State, 2019'),geo = set_map_details)
+fig2019
+```
+
+
+## Create 2020 Map (delete if not using)
+```{r, include=FALSE}
+library(dplyr)
+
+st_crosswalk <- tibble(state = state.name) %>%
+   bind_cols(tibble(abb = state.abb))
+
+vaxtrim2020 <- left_join(vaxtrim2020, st_crosswalk, by = "state")
+
+
+#Create map 2020
+fig2020<-plot_geo(vaxtrim2020, locationmode = 'USA-states') %>% 
+  add_trace(
+    z = ~Percent_Vax, 
+    locations = ~abb,
+    color = ~Percent_Vax, 
+    colors = 'Greens'
+  )
+fig2020 <- fig2020 %>% colorbar(title = "Vaccination Rate (%)", limits = c(20,90)) #Make sure limits are same for both maps
+fig2020 <- fig2020 %>% layout(title = paste('Influenza Vaccination Rate During Pregnancy by State, 2020'),
+    geo = set_map_details)
+
+
+```
+
+
+```{r, echo=FALSE}
+### Plot together 
+finalfig <- subplot(fig2012, fig2019, nrows = 2) %>% 
+  layout(showlegend = FALSE,
+         title = paste('Influenza Vaccination Rate During Pregnancy by State in 2012 vs 2019'),
+         hovermode = TRUE
+         ) %>%
+  colorbar(title = "Vaccination Rate (%)", limits = c(20,90))
+
+annotations = list( 
+  list( 
+    x = 0.5,
+    y = 0.5,
+    text = "2012",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE   
+  ),  
+  list( 
+    x = 0.5,
+    y = -0.05,
+    text = "2019",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ))
+finalfig <- finalfig %>%layout(annotations = annotations) 
+finalfig
+```
+
+
+
+
+```{r, examine by region, first create region variable, include=FALSE}
+vaxtrimDT<-as.data.table(vaxtrim)
+
+vaxtrimDT_region <-vaxtrimDT[, region := fifelse(state== "Alaska"| state=="Arizona" | state=="California" | state=="Colorado"| state=="Hawaii"| state=="Idaho"| state=="Montana"| state=="Nevada"| state=="New Mexico"| state=="Oregon"| state=="Utah"| state=="Washington"| state== "Wyoming", "WEST",
+                fifelse(state=="Alabama"|state=="Arkansas"|state== "Delaware" | state=="Florida"|state== "Georgia" | state=="Kentucky" |state== "Louisiana"|state== "Maryland" | state=="Mississippi" |state=="North Carolina"|state=="Oklahoma"| state=="South Carolina"| state=="Tennessee" |state=="Texas"|state== "Virginia"|state== "West Virginia", "SOUTH",
+                fifelse(state=="Illinois"| state=="Indiana"| state=="Iowa"|state== "Kansas"| state=="Michigan"|state== "Minnesota"| state=="Missouri"| state=="Nebraska"| state=="North Dakota"| state=="Ohio"|state=="South Dakota"|state=="Wisconsin", "MIDWEST",                        "NORTHEAST")))]
+
+```
+
+```{r, compare vaccine rates by region over time, echo=FALSE}
+vaxtrimDF_region<-as.data.frame(vaxtrimDT_region)
+
+
+
+vaxtrimDF_region%>% 
+  filter(Dimension=="≥18 Years", Year==2012| Year==2019) %>% 
+  ggplot(aes(y=Percent_Vax, x=region, fill = region)) +   
+  geom_boxplot(color="black")+
+  labs(title="Influenza Vaccination Rate Among Pregnant Women in the U.S. 2012 vs 2019",  y= "Vaccination Rate (%)")+
+    theme(axis.text.x=element_blank(),legend.background = element_rect(color = "black")
+                                        )+
+scale_fill_brewer(palette = "Blues")+
+  facet_wrap(~Year, nrow=1)
+```
 
 
