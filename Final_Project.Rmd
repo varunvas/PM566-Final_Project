@@ -21,6 +21,7 @@ library(knitr)
 library(ggplot2)
 library(readr)
 library(plotly)
+library(DT)
 ```
 
 ```{r, upload dataset, include=FALSE}
@@ -29,80 +30,98 @@ if (!file.exists("https://raw.githubusercontent.com/CBSC73/PM566-Final_Project/m
                 "Vaccination_Coverage_dataset.txt", method="libcurl", timeout = 60)  
 }
 
-#Create data table, remove last two columns as will not use these
-vax <- data.table::fread("Vaccination_Coverage_dataset.txt", stringsAsFactors = F, data.table=getOption("datatable.fread.datatable", TRUE), drop=8:9)  
+vax <- data.table::fread("Vaccination_Coverage_dataset.txt", data.table=getOption("datatable.fread.datatable", TRUE)) 
+
 ```
-
-
 ```{r, look at variables, include=FALSE}
-dim(vax)
-head(vax)
-```
-
-
-```{r, clean data, include=FALSE}
-
 #Rename columns
-vax <- rename(vax, Year="Survey Year/Influenza Season", Percent_Vax="Estimate (%)",Age_Ethn="Dimension Type", Geog_Type="Geography Type")
+vaxdf<-as.data.frame(vax)
+vaxdf <- rename(vaxdf, Year="Survey Year/Influenza Season", Percent_Vax="Estimate (%)",Age_Ethn="Dimension Type", Geog_Type="Geography Type")
+
+#Remove duplicates
+vaxdf<-unique(vaxdf)
+dim(vaxdf)
+
+#Remove Tdap data,Puerto Rico, City of NY/Rest of NY, D.C.
+vaxdf<-vaxdf%>%filter(Vaccine=="Influenza", Geography!="District of Columbia", Geography!="NY-City of New York", Geography!="NY-Rest of state", Geography!="Puerto Rico")
+dim(vaxdf)
+
+#Make variables numeric to better evaluate them
+head(vaxdf)
+vaxdf$Percent_Vax<-as.numeric(as.character(vaxdf$Percent_Vax))
+vaxdf$Year<-as.numeric(as.character(vaxdf$Year))
 
 
-#Select Influenza data only, remove District of Columbia and City of New York/Rest of state (regular states only) to use for Chloropleth map
-vaxdf<- as.data.frame(vax)
-vaxtrim <-vaxdf %>% filter(Vaccine=="Influenza", Geography!="District of Columbia", Geography!="NY-City of New York", Geography!="NY-Rest of state", Geography!="Puerto Rico", Geography!="United States")
+#Look for missing values
+dim(vaxdf)
+colSums(is.na(vaxdf)) #There are 267 missing values out of 2470 (10.8%)
 
+#Where are the missing values? Will check by variables of interest: Age, Race/Ethnicity, location (U.S., states)
+vaxdfage<-vaxdf %>% filter(Age_Ethn=="Age")
+vaxdfeth<-vaxdf %>% filter(Age_Ethn=="Race/Ethnicity")
+vaxdfUS<-vaxdf %>% filter(Geog_Type=="National")
+vaxdfSTATES<-vaxdf %>% filter(Geog_Type=="States")
 
-#Rename Geography column to "state" for the map
-vaxtrim <- rename(vaxtrim, state=Geography)
+#Age
+colSums(is.na(vaxdfage)) #12 missing values out of 1244 (1%)
+dim(vaxdfage)
 
+#Ethnicity
+colSums(is.na(vaxdfeth)) #255 missing values out of 1226 (20.1%)
+dim(vaxdfeth)
 
-#Make percent vax numeric
-vaxtrim$Percent_Vax<-as.numeric(as.character(vaxtrim$Percent_Vax))
+#National
+colSums(is.na(vaxdfUS)) #No missing values
+dim(vaxdfUS)
+
+#States
+colSums(is.na(vaxdfSTATES)) #267 missing values out of 2398 (11.1%)
+dim(vaxdfSTATES)
+
+#We can see that the vast majority of missing values are Race/Ethnicity data points in the state specific data. I only plan to examine race/ethnicity on a national level however so will not try to impute NA valu1es.
+
 ```
-```{r, create 2012 and 2019 datasets, include=FALSE}
+
+```{r, create 2012 and 2020 datasets, include=FALSE}
 
 #Create datasets 
-vaxtrim2012<-vaxtrim %>% filter(Year=="2012", Dimension=="≥18 Years")
-unique(vaxtrim2012$Year)
+vaxtrim2012<-vaxdfSTATES %>% filter(Year=="2012", Dimension=="≥18 Years")
 
-vaxtrim2019<-vaxtrim %>% filter(Year=="2019", Dimension=="≥18 Years")
-unique(vaxtrim2019$Year)
-
+vaxtrim2020<-vaxdfSTATES %>% filter(Year=="2020", Dimension=="≥18 Years")
 
 #Check each dataset for NA values
 colSums(is.na(vaxtrim2012))
-colSums(is.na(vaxtrim2019))
-#There are no missing values in the datasets 
+colSums(is.na(vaxtrim2020))
+#There are no missing values for Age over 18 years data in the selected years
 
-#Remove duplicates
+#Remove duplicates again just in case
 vaxtrim2012<-distinct(vaxtrim2012)
-vaxtrim2019<-distinct(vaxtrim2019)
+vaxtrim2020<-distinct(vaxtrim2020)
 
 view(vaxtrim2012)#Only 29 states included
-view(vaxtrim2019)#Only 40 states included
+view(vaxtrim2020)#Only 39 states included
 
-unique(vaxtrim2012$Percent_Vax)
-
-
-vaxtrim2020<-vaxtrim %>% filter(Year=="2020", Dimension=="≥18 Years")
-unique(vaxtrim2020$state)
 ```
 
 
 ```{r, chloropleth set up, include=FALSE}
 
-view(state.abb)
-view(state.name)
 library(dplyr)
 
+#Rename the Geography column "state" so it will merge 
+vaxtrim2012 <- rename(vaxtrim2012, state="Geography")
+vaxtrim2020 <- rename(vaxtrim2020, state="Geography")
+
+#Get state info into dataset, merge
 st_crosswalk <- tibble(state = state.name) %>%
    bind_cols(tibble(abb = state.abb))
 
 vaxtrim2012 <- left_join(vaxtrim2012, st_crosswalk, by = "state")
-vaxtrim2019 <- left_join(vaxtrim2019, st_crosswalk, by = "state")
+vaxtrim2020 <- left_join(vaxtrim2020, st_crosswalk, by = "state")
 
 #Create hover text
 vaxtrim2012$hover<-with(vaxtrim2012, paste(state, '<br>', "Vaccination Rate(%):", Percent_Vax))
-vaxtrim2019$hover<-with(vaxtrim2019, paste(state, '<br>', "Vaccination Rate(%):", Percent_Vax))
+vaxtrim2020$hover<-with(vaxtrim2020, paste(state, '<br>', "Vaccination Rate(%):", Percent_Vax))
 
 # Set up mapping details
 set_map_details<- list(
@@ -123,17 +142,16 @@ fig2012<-plot_geo(vaxtrim2012, locationmode = 'USA-states') %>%
     color = ~Percent_Vax, 
     colors = 'Greens'
   )
-fig2012 <- fig2012 %>% colorbar(title = "Vaccination Rate (%)", limits = c(20,90))
-fig2012 <- fig2012 %>% layout(title = paste('Influenza Vaccination Rate During Pregnancy by State, 2012'),
+fig2012 <- fig2012 %>% colorbar(title = "Vaccination Rate (%)", limits = c(25,85))
+fig2012 <- fig2012 %>% layout(title = paste('Influenza Vaccination Rate During Pregnancy by State, 2012'), landcolor='#e5ecf6',
     geo = set_map_details)
 
-fig2012
 ```
 
 
 ```{r, include=FALSE}
-#Create map 2019
-fig2019<-plot_geo(vaxtrim2019, locationmode = 'USA-states') %>% 
+#Create map 2020
+fig2020<-plot_geo(vaxtrim2020, locationmode = 'USA-states') %>% 
   add_trace(
     z = ~Percent_Vax, 
     text = ~hover, 
@@ -142,46 +160,19 @@ fig2019<-plot_geo(vaxtrim2019, locationmode = 'USA-states') %>%
     colors = 'Greens',
     showscale = FALSE
   )
-fig2019 <- fig2019 %>% colorbar(limits = c(20,90)) #Make sure limits are same for both maps
-fig2019 <- fig2019 %>% layout(title = paste('Influenza Vaccination Rate During Pregnancy by State, 2019'),geo = set_map_details)
-fig2019
-```
-
-
-## Create 2020 Map (delete if not using)
-```{r, include=FALSE}
-library(dplyr)
-
-st_crosswalk <- tibble(state = state.name) %>%
-   bind_cols(tibble(abb = state.abb))
-
-vaxtrim2020 <- left_join(vaxtrim2020, st_crosswalk, by = "state")
-
-
-#Create map 2020
-fig2020<-plot_geo(vaxtrim2020, locationmode = 'USA-states') %>% 
-  add_trace(
-    z = ~Percent_Vax, 
-    locations = ~abb,
-    color = ~Percent_Vax, 
-    colors = 'Greens'
-  )
-fig2020 <- fig2020 %>% colorbar(title = "Vaccination Rate (%)", limits = c(20,90)) #Make sure limits are same for both maps
-fig2020 <- fig2020 %>% layout(title = paste('Influenza Vaccination Rate During Pregnancy by State, 2020'),
-    geo = set_map_details)
-
-
+fig2020 <- fig2020 %>% colorbar(limits = c(25,85)) #Make sure limits are same for both maps
+fig2020<- fig2020 %>% layout(title = paste('Influenza Vaccination Rate During Pregnancy by State, 2020'), landcolor='#e5ecf6',geo = set_map_details)
 ```
 
 
 ```{r, echo=FALSE}
 ### Plot together 
-finalfig <- subplot(fig2012, fig2019, nrows = 2) %>% 
+finalfig <- subplot(fig2012, fig2020, nrows = 2) %>% 
   layout(showlegend = FALSE,
-         title = paste('Influenza Vaccination Rate During Pregnancy by State in 2012 vs 2019'),
+         title = paste('Influenza Vaccination Rate During Pregnancy by State in 2012 vs 2020'),
          hovermode = TRUE
          ) %>%
-  colorbar(title = "Vaccination Rate (%)", limits = c(20,90))
+  colorbar(title = "Vaccination Rate (%)", limits = c(25,85))
 
 annotations = list( 
   list( 
@@ -197,14 +188,14 @@ annotations = list(
   list( 
     x = 0.5,
     y = -0.05,
-    text = "2019",  
+    text = "2020",  
     xref = "paper",  
     yref = "paper",  
     xanchor = "center",  
     yanchor = "bottom",  
     showarrow = FALSE 
   ))
-finalfig <- finalfig %>%layout(annotations = annotations) 
+finalfig <- finalfig %>%layout(annotations = annotations)
 finalfig
 ```
 
@@ -212,28 +203,128 @@ finalfig
 
 
 ```{r, examine by region, first create region variable, include=FALSE}
-vaxtrimDT<-as.data.table(vaxtrim)
+vaxdfSTATES <- rename(vaxdfSTATES, state="Geography")
 
-vaxtrimDT_region <-vaxtrimDT[, region := fifelse(state== "Alaska"| state=="Arizona" | state=="California" | state=="Colorado"| state=="Hawaii"| state=="Idaho"| state=="Montana"| state=="Nevada"| state=="New Mexico"| state=="Oregon"| state=="Utah"| state=="Washington"| state== "Wyoming", "WEST",
+vaxdtSTATES<-as.data.table(vaxdfSTATES)
+
+vaxdtSTATES <-vaxdtSTATES[, region := fifelse(state== "Alaska"| state=="Arizona" | state=="California" | state=="Colorado"| state=="Hawaii"| state=="Idaho"| state=="Montana"| state=="Nevada"| state=="New Mexico"| state=="Oregon"| state=="Utah"| state=="Washington"| state== "Wyoming", "WEST",
                 fifelse(state=="Alabama"|state=="Arkansas"|state== "Delaware" | state=="Florida"|state== "Georgia" | state=="Kentucky" |state== "Louisiana"|state== "Maryland" | state=="Mississippi" |state=="North Carolina"|state=="Oklahoma"| state=="South Carolina"| state=="Tennessee" |state=="Texas"|state== "Virginia"|state== "West Virginia", "SOUTH",
                 fifelse(state=="Illinois"| state=="Indiana"| state=="Iowa"|state== "Kansas"| state=="Michigan"|state== "Minnesota"| state=="Missouri"| state=="Nebraska"| state=="North Dakota"| state=="Ohio"|state=="South Dakota"|state=="Wisconsin", "MIDWEST",                        "NORTHEAST")))]
+
+head(vaxdtSTATES)
 
 ```
 
 ```{r, compare vaccine rates by region over time, echo=FALSE}
-vaxtrimDF_region<-as.data.frame(vaxtrimDT_region)
+vaxdfSTATES<-as.data.frame(vaxdtSTATES)
 
-
-
-vaxtrimDF_region%>% 
-  filter(Dimension=="≥18 Years", Year==2012| Year==2019) %>% 
+vaxdfSTATES%>% 
+  filter(Dimension=="≥18 Years", Year==2012| Year==2020) %>% 
   ggplot(aes(y=Percent_Vax, x=region, fill = region)) +   
   geom_boxplot(color="black")+
-  labs(title="Influenza Vaccination Rate Among Pregnant Women in the U.S. 2012 vs 2019",  y= "Vaccination Rate (%)")+
+  labs(title="Influenza Vaccination Rate Among Pregnant Women in the U.S. 2012 vs 2020",  y= "Vaccination Rate (%)")+
     theme(axis.text.x=element_blank(),legend.background = element_rect(color = "black")
                                         )+
 scale_fill_brewer(palette = "Blues")+
   facet_wrap(~Year, nrow=1)
+
 ```
+
+
+
+#### These are medians with ranges
+
+```{r, create interactive line graphs, echo=FALSE}
+
+gall<-vaxdfSTATES%>% filter(Dimension=="≥18 Years") %>% arrange(Year) %>% 
+plot_ly(x = ~Year, y = ~Percent_Vax, color = ~state, type = "scatter", mode = "lines",
+        hoverinfo = 'text',
+        text = ~paste(paste(state), 
+                  paste("% Vaccinated: ", Percent_Vax, sep=""), sep = "<br>")) %>% 
+       layout(title = "Influenza Vaccination Among U.S Women by State, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)"), legend=list(title =list(text= "<br>STATE<br>")))
+
+gall
+```
+
+
+
+# Look closer at increase in overall vaccination rates? Examine Age and Ethnicity as potential factors. 
+
+
+```{r,  data prep, include=FALSE}
+
+vaxdtUS<-as.data.table(vaxdfUS)
+
+#Rename terms in the Dimension variable so they're easier to work with 
+vaxdtUS<-vaxdtUS[, Dimension1 := fifelse(Dimension=="≥35 Years", "35+ Years", 
+                                             fifelse(Dimension=="18-24 Years", "18-24 Years", 
+                                             fifelse(Dimension=="25-34 Years", "25-34 Years", 
+                                             fifelse(Dimension=="≥18 Years", "18+ Years", 
+                                             fifelse(Dimension=="Black, Non-Hispanic", "Black", 
+                                             fifelse(Dimension=="White, Non-Hispanic", "White", 
+                                             fifelse(Dimension=="Hispanic", "Hispanic", "Other")))))))]
+
+
+#Make into a dataframe for graphs
+vaxdfUS<-as.data.frame(vaxdtUS)
+```
+```{r}
+#Plotly Version, AGE
+agebar<-vaxdfUS%>%
+   filter(Age_Ethn=="Age",Dimension1 !="18+ Years") %>%  
+   plot_ly(x= ~Year, y= ~Percent_Vax, type= 'bar', color = ~Dimension1, colors = "Dark2",
+          hoverinfo = 'textage',
+          textage = ~paste(paste("Year:", Year, sep=""),
+                     paste("Age:", Dimension1, sep=""),
+                     paste("% Vaccinated: ", Percent_Vax, sep=""),
+                     sep = "<br>"))%>% 
+       layout(title = "Influenza Vaccination Among U.S Women by Age Group, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)", range=c(0,100)), legend=list(title =list(text= "<br>Age<br>")))
+
+agebar
+
+ggplotly(agebar, tooltip="textage")
+
+```
+
+```{r}
+#Plotly Version, ETHNICITY
+ethbar<-vaxdfUS%>%
+   filter(Age_Ethn=="Race/Ethnicity") %>%  
+   plot_ly(x= ~Year, y= ~Percent_Vax, type= 'bar', color = ~Dimension1, colors = "Set2",
+          hoverinfo = 'texteth',
+          textage = ~paste(paste("Year:", Year, sep=""),
+                     paste("Race/Ethnicity:", Dimension1, sep=""),
+                     paste("% Vaccinated: ", Percent_Vax, sep=""),
+                     sep = "<br>"))%>% 
+       layout(title = "Influenza Vaccination Among U.S Women by Race/Ethnic Group, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)", range=c(0,100)), legend=list(title =list(text= "<br>Race/Ethnic Group<br>")))
+
+ethbar
+
+ggplotly(ethbar, tooltip="texteth")
+
+```
+
+
+```{r, create interactive table of National Data, echo=FALSE}
+#Create interactive table with DT package
+head(vaxdfSTATES)
+
+table1<-vaxdfUS %>% select(Year, Dimension, Percent_Vax) 
+colnames(table1)<- c("Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
+knitr::kable(table1, align=c("c", "c", "c"), caption = "Table 1. Nationwide: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020")
+datatable(table1)
+
+```
+```{r, create interactive table of States Data, echo=FALSE}
+
+table2<-vaxdfSTATES %>% filter(!is.na(Percent_Vax)) %>% select(state,Year, Dimension, Percent_Vax)
+colnames(table2)<- c("State", "Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
+knitr::kable(table2, align=c("c", "c", "c", "c"), caption = "Table 2. By State: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020")
+datatable(table2)
+```
+
+
+
+
 
 
