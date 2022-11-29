@@ -56,15 +56,15 @@ library(plotly)
 library(DT)
 ```
 
-```{r, upload dataset, include=FALSE}
+```{r load-data, echo=FALSE}
 if (!file.exists("https://raw.githubusercontent.com/CBSC73/PM566-Final_Project/main/Vaccination_Coverage_dataset.txt")) {
   download.file("https://raw.githubusercontent.com/CBSC73/PM566-Final_Project/main/Vaccination_Coverage_dataset.txt", 
                 "Vaccination_Coverage_dataset.txt", method="libcurl", timeout = 60)  
 }
 
 vax <- data.table::fread("Vaccination_Coverage_dataset.txt", data.table=getOption("datatable.fread.datatable", TRUE)) 
-
 ```
+
 ```{r, look at variables, include=FALSE}
 #Rename columns
 vaxdf<-as.data.frame(vax)
