@@ -278,7 +278,7 @@ plot_ly(x = ~Year, y = ~Percent_Vax, color = ~state, type = "scatter", mode = "l
 gall
 ```
 
-#### Table with vaccination rate changes values
+### Table 1. Change in Vaccination Rate From 2012 to 2020 by State
 ```{r}
 vaxchange<-vaxdfSTATES %>% 
   filter(Year=="2012"|Year=="2020", Dimension=="≥18 Years") %>% 
@@ -289,9 +289,7 @@ vaxchange$Change = (vaxchange$"2020" - vaxchange$"2012")
 
 colnames(vaxchange)<- c("State", "Year: 2012", "Year: 2020", "Change")
 
-knitr::kable(vaxchange, align=c("l", "c", "c", "c"), caption = "Table 1. Change in Vaccination Rate From 2012 to 2020 by State")
-
-datatable(vaxchange)
+datatable(vaxchange, rownames = F)
 ```
 
 
@@ -330,9 +328,6 @@ agebar<-vaxdfUS%>%
        layout(title = "Influenza Vaccination Among U.S Women by Age Group, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)", range=c(0,100)), legend=list(title =list(text= "<br>Age<br>")))
 
 agebar
-
-ggplotly(agebar, tooltip="textage")
-
 ```
 
 ```{r}
@@ -349,27 +344,24 @@ ethbar<-vaxdfUS%>%
 
 ethbar
 
-ggplotly(ethbar, tooltip="texteth")
-
 ```
 
-
+### Table 2. Nationwide: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020
 ```{r, create interactive table of National Data, echo=FALSE}
 #Create interactive table with DT package
 head(vaxdfSTATES)
 
 table2<-vaxdfUS %>% select(Year, Dimension, Percent_Vax) 
 colnames(table2)<- c("Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
-knitr::kable(table2, align=c("c", "c", "c"), caption = "Table 2. Nationwide: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020")
-datatable(table2)
-
+datatable(table2, rownames = F)
 ```
+
+### Table 3. By State: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020
 ```{r, create interactive table of States Data, echo=FALSE}
 
 table3<-vaxdfSTATES %>% filter(!is.na(Percent_Vax)) %>% select(state,Year, Dimension, Percent_Vax)
 colnames(table3)<- c("State", "Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
-knitr::kable(table3, align=c("c", "c", "c", "c"), caption = "Table 3. By State: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020")
-datatable(table3)
+datatable(table3, rownames = F)
 ```
 
 
