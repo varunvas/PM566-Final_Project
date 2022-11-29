@@ -1,15 +1,47 @@
 ---
 title: "PM566 Final Project"
 author: "CB"
-date: "`r Sys.Date()`"
-output: github_document
-always_allow_html: true
+output: 
+    html_document:
+        toc: TRUE
+        toc_float: TRUE
 ---
 
 ```{r setup, include=FALSE} 
-knitr::opts_chunk$set(echo = TRUE)
-options(repos = c(CRAN = "http://cran.rstudio.com"))
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  eval=TRUE,
+  echo = TRUE,
+  cache = FALSE,
+  fig.width = 7, 
+  fig.align = 'center',
+  fig.asp = 0.618,
+  out.width = "700px",
+options(repos = c(CRAN = "http://cran.rstudio.com")))
 ```
+
+
+This is my PM566 Final Project website.
+
+<br>
+
+# Setup
+
+```{r, echo=FALSE}
+# Initialize code chunk options
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  eval=TRUE,
+  echo = TRUE,
+  cache = FALSE,
+  fig.width = 7, 
+  fig.align = 'center',
+  fig.asp = 0.618,
+  out.width = "700px")
+```
+
 
 ```{r, Load required libraries, include=FALSE}
 library(data.table)
@@ -225,7 +257,7 @@ vaxdfSTATES%>%
   labs(title="Influenza Vaccination Rate Among Pregnant Women in the U.S. 2012 vs 2020",  y= "Vaccination Rate (%)")+
     theme(axis.text.x=element_blank(),legend.background = element_rect(color = "black")
                                         )+
-scale_fill_brewer(palette = "Blues")+
+scale_fill_brewer(palette = "Purples")+
   facet_wrap(~Year, nrow=1)
 
 ```
@@ -245,6 +277,23 @@ plot_ly(x = ~Year, y = ~Percent_Vax, color = ~state, type = "scatter", mode = "l
 
 gall
 ```
+
+#### Table with vaccination rate changes values
+```{r}
+vaxchange<-vaxdfSTATES %>% 
+  filter(Year=="2012"|Year=="2020", Dimension=="≥18 Years") %>% 
+  select(state, Year, Percent_Vax) %>% 
+  pivot_wider(names_from=Year, values_from=Percent_Vax)
+
+vaxchange$Change = (vaxchange$"2020" - vaxchange$"2012")
+
+colnames(vaxchange)<- c("State", "Year: 2012", "Year: 2020", "Change")
+
+knitr::kable(vaxchange, align=c("l", "c", "c", "c"), caption = "Table 1. Change in Vaccination Rate From 2012 to 2020 by State")
+
+datatable(vaxchange)
+```
+
 
 
 
@@ -309,18 +358,18 @@ ggplotly(ethbar, tooltip="texteth")
 #Create interactive table with DT package
 head(vaxdfSTATES)
 
-table1<-vaxdfUS %>% select(Year, Dimension, Percent_Vax) 
-colnames(table1)<- c("Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
-knitr::kable(table1, align=c("c", "c", "c"), caption = "Table 1. Nationwide: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020")
-datatable(table1)
+table2<-vaxdfUS %>% select(Year, Dimension, Percent_Vax) 
+colnames(table2)<- c("Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
+knitr::kable(table2, align=c("c", "c", "c"), caption = "Table 2. Nationwide: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020")
+datatable(table2)
 
 ```
 ```{r, create interactive table of States Data, echo=FALSE}
 
-table2<-vaxdfSTATES %>% filter(!is.na(Percent_Vax)) %>% select(state,Year, Dimension, Percent_Vax)
-colnames(table2)<- c("State", "Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
-knitr::kable(table2, align=c("c", "c", "c", "c"), caption = "Table 2. By State: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020")
-datatable(table2)
+table3<-vaxdfSTATES %>% filter(!is.na(Percent_Vax)) %>% select(state,Year, Dimension, Percent_Vax)
+colnames(table3)<- c("State", "Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
+knitr::kable(table3, align=c("c", "c", "c", "c"), caption = "Table 3. By State: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020")
+datatable(table3)
 ```
 
 
