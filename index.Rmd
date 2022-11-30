@@ -445,4 +445,4 @@ datatable(table3, rownames = F)
 <br>
 <br>
 
-##### <img src="https://www.logo.wine/a/logo/GitHub/GitHub-Logo.wine.svgView" width="40px"> View my Github Repository for this project [here](https://github.com/CBSC73/PM566-Final_Project)
+##### <img src="https://www.logo.wine/a/logo/GitHub/GitHub-Icon-White-Dark-Background-Logo.wine.svg" width="40px"> View project Github Repository [here](https://github.com/CBSC73/PM566-Final_Project)
