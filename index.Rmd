@@ -254,9 +254,9 @@ finalfig
 <br>
 <br>
 
-#### _*Overall, vaccination rates have increased between 2012-2020._
-#### _*The Midwest and Northeast regions appear particularly increased._
-######      _Note: Not all states included. In 2012, 29 of 50 states; in 2020, 39 of 50._
+####  *Overall, vaccination rates have increased between 2012-2020.
+####  *The Midwest and Northeast regions appear particularly increased.
+#####     _Note: Not all states included. In 2012, 29 of 50 states; in 2020, 39 of 50._
 
 
 ```{r, examine by region, first create region variable, include=FALSE}
@@ -287,12 +287,12 @@ scale_fill_brewer(palette = "Purples")+
   facet_wrap(~Year, nrow=1)
 ```
 
-#### _*All U.S. regions had higher vaccination rates in 2020 than 2012._
-#### _*The pattern has remained consistent, lowest rates in the South, highest rates in the Northeast._
-###### _Note: Lines in each box are median values._ 
+####  *All U.S. regions had higher vaccination rates in 2020 than 2012.
+####  *The pattern has remained consistent, lowest rates in the South, highest rates in the Northeast.
+##### _Note: Lines in each box are median values._ 
 <br>
 
-### __Delving deeper: individual STATE trends__ 
+### __Delving deeper: Individual STATE trends__ 
 <br>
 
 ```{r, create interactive line graphs, echo=FALSE}
@@ -310,7 +310,7 @@ gall
 <br>
 <br>
 
-#### By the numbers: Examine trends by state, year, and percent vaccination rate _change_ (from 2012 to 2020) by ordering and searching data.
+### __By the numbers: Examine trends by state, year, and percent vaccination rate _change_ (from 2012 to 2020) by ordering and searching data.__
 <br>
 
 ### Table 1. Change in Vaccination Rate by State, 2012 to 2020
@@ -330,7 +330,7 @@ datatable(vaxchange, rownames = F)
 
 <br>
 
-#### _*Hawaii, Wyoming, and Maryland top the list of states with the largest increases in vaccination rates._
+#### *Hawaii, Wyoming, and Maryland top the list of states with the largest increases in vaccination rates.
 <br>
 <br>
 
@@ -372,8 +372,8 @@ agebar
 
 <br>
 
-####  _*Older women are more likely to be vaccinated against Influenza._
-####  _*This trend is consistent across the years._ 
+####  *Older women are more likely to be vaccinated against Influenza.
+####  *This trend is consistent across the years. 
 
 <br>
 
@@ -394,21 +394,22 @@ ethbar
 
 <br>
 
-#### _*Women in the "other" race/ethnicity category have the highest vaccination rates as of 2020, overtaking White women in 2014._
-#### _*Black women have the lowest rates of vaccination and since 2016 rates have been trending downward._ 
+#### *Women in the "other" race/ethnicity category have the highest vaccination rates as of 2020, overtaking White women in 2014.
+#### *Black women have the lowest rates of vaccination and since 2016 rates have been trending downward.
 
 <br>
 <br>
 
-### By the numbers: Examining vaccination nationally (table 2) and by state (table 3) for age and race/ethnicity subpopulations.
+### __By the numbers: Examining vaccination nationally (table 2) and by state (table 3) for age and race/ethnicity subpopulations.__
 
 <br>
 
-###### _Note: age and rate/ethnicity data are reported separately and thus cannot be examined simultaneously. Choose which groups you would like to view using the second column, or by Search box (top right)._
-
-<br>
 
 ### Table 2. Nationwide: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020
+
+###### _Note: age and rate/ethnicity data are reported separately and thus cannot be examined simultaneously. Choose which groups you would like to view using the second column, or by Search box (top right)._
+<br>
+
 ```{r, create interactive table of National Data, echo=FALSE}
 #Create interactive table with DT package
 
