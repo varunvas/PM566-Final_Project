@@ -425,6 +425,24 @@ table3<-vaxdfSTATES %>% filter(!is.na(Percent_Vax)) %>% select(state,Year, Dimen
 colnames(table3)<- c("State", "Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
 datatable(table3, rownames = F)
 ```
+<br>
+<br>
+
+## __Key Takeaways__
+
+<br>
+
+###      *Nationwide, vaccination for influenza virus is increasing since 2012
+<br>
+
+###      *All regions of the U.S. show increasing vaccination rates, though the South continues with low rates (below 50%).
+<br>
+
+###      *Older women are more likely to be vaccinated than younger women, though all age groups have increased their vaccine rates since 2012.
+<br>
+
+###      *Women who identify as "Other" ethnic group are the most likely to be vaccinated, and those who identify as Black are least likely to be vaccinated.
+<br>
 
 
 
