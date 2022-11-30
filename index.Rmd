@@ -443,9 +443,6 @@ datatable(table3, rownames = F)
 
 ###      *Women who identify as "Other" ethnic group are the most likely to be vaccinated, and those who identify as Black are least likely to be vaccinated.
 <br>
+<br>
 
-
-
-
-
-
+##### <img src="https://www.logo.wine/a/logo/GitHub/GitHub-Logo.wine.svgView" width="40px"> View my Github Repository for this project [here](https://github.com/CBSC73/PM566-Final_Project)
