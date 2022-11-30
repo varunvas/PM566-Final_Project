@@ -1,5 +1,5 @@
 ---
-title: "PM566 Final Project"
+title: "Influenza Vaccination Among Pregnant U.S. Women, 2012-2020: A Qualitative Analysis"
 author: "CB"
 output: 
     html_document:
@@ -22,11 +22,29 @@ options(repos = c(CRAN = "http://cran.rstudio.com")))
 ```
 
 
-This is my PM566 Final Project website.
-
 <br>
 
-# Setup
+## __Research Question__
+####     1. Among Pregnant Women in the U.S., are Influenza vaccination rates increasing or decreasing?  
+####     2. Which subpopulations (U.S. state/region, age group, race/ethnicity) are driving these trends? 
+<br>
+
+## __Why Study Influenza Vaccination in Pregnant Women?__
+#### +Pregnant women are particularly susceptible to the influenza virus due to their immune tolerant status in pregnancy
+#### +Influenza infection during pregnancy is associated with increased risk of neurodevelopmental disorders in children, including autism and schizophrenia
+#### +Vaccination during pregnancy protects another vulnerable population: newborns, especially those born preterm or with pulmonary conditions. 
+<br>
+
+## __Methods__
+#### +Data source: Centers for Disease Control (CDC) website
+#### +Population: Women aged 18-49 years, pregnant anytime between August 1st- survey date
+#### +Data acquision: Internet panel national survey conducted at the end of Flu Season (March-April)
+#### +Sample sizes (N) between 32-47K/year 
+#### +Timeframe: All years between 2012-2020
+<br>
+<br>
+<br>
+
 
 ```{r, echo=FALSE}
 # Initialize code chunk options
@@ -56,7 +74,7 @@ library(plotly)
 library(DT)
 ```
 
-```{r load-data, echo=FALSE}
+```{r load-data, include=FALSE}
 if (!file.exists("https://raw.githubusercontent.com/CBSC73/PM566-Final_Project/main/Vaccination_Coverage_dataset.txt")) {
   download.file("https://raw.githubusercontent.com/CBSC73/PM566-Final_Project/main/Vaccination_Coverage_dataset.txt", 
                 "Vaccination_Coverage_dataset.txt", method="libcurl", timeout = 60)  
@@ -135,6 +153,8 @@ view(vaxtrim2020)#Only 39 states included
 
 ```
 
+### __National Overview: Visualization by State__   
+<br>
 
 ```{r, chloropleth set up, include=FALSE}
 
@@ -162,8 +182,9 @@ set_map_details<- list(
   showlakes = TRUE,
   lakecolor = toRGB('white')
 )
-
 ```
+
+
 ```{r, include=FALSE}
 #Create map 2012
 fig2012<-plot_geo(vaxtrim2012, locationmode = 'USA-states') %>% 
@@ -230,8 +251,12 @@ annotations = list(
 finalfig <- finalfig %>%layout(annotations = annotations)
 finalfig
 ```
+<br>
+<br>
 
-
+#### _*Overall, vaccination rates have increased between 2012-2020._
+#### _*The Midwest and Northeast regions appear particularly increased._
+######      _Note: Not all states included. In 2012, 29 of 50 states; in 2020, 39 of 50._
 
 
 ```{r, examine by region, first create region variable, include=FALSE}
@@ -242,10 +267,11 @@ vaxdtSTATES<-as.data.table(vaxdfSTATES)
 vaxdtSTATES <-vaxdtSTATES[, region := fifelse(state== "Alaska"| state=="Arizona" | state=="California" | state=="Colorado"| state=="Hawaii"| state=="Idaho"| state=="Montana"| state=="Nevada"| state=="New Mexico"| state=="Oregon"| state=="Utah"| state=="Washington"| state== "Wyoming", "WEST",
                 fifelse(state=="Alabama"|state=="Arkansas"|state== "Delaware" | state=="Florida"|state== "Georgia" | state=="Kentucky" |state== "Louisiana"|state== "Maryland" | state=="Mississippi" |state=="North Carolina"|state=="Oklahoma"| state=="South Carolina"| state=="Tennessee" |state=="Texas"|state== "Virginia"|state== "West Virginia", "SOUTH",
                 fifelse(state=="Illinois"| state=="Indiana"| state=="Iowa"|state== "Kansas"| state=="Michigan"|state== "Minnesota"| state=="Missouri"| state=="Nebraska"| state=="North Dakota"| state=="Ohio"|state=="South Dakota"|state=="Wisconsin", "MIDWEST",                        "NORTHEAST")))]
-
-head(vaxdtSTATES)
-
 ```
+
+### __A closer look at trends by REGION__ 
+<br>
+
 
 ```{r, compare vaccine rates by region over time, echo=FALSE}
 vaxdfSTATES<-as.data.frame(vaxdtSTATES)
@@ -259,12 +285,15 @@ vaxdfSTATES%>%
                                         )+
 scale_fill_brewer(palette = "Purples")+
   facet_wrap(~Year, nrow=1)
-
 ```
 
+#### _*All U.S. regions had higher vaccination rates in 2020 than 2012._
+#### _*The pattern has remained consistent, lowest rates in the South, highest rates in the Northeast._
+###### _Note: Lines in each box are median values._ 
+<br>
 
-
-#### These are medians with ranges
+### __Delving deeper: individual STATE trends__ 
+<br>
 
 ```{r, create interactive line graphs, echo=FALSE}
 
@@ -277,9 +306,16 @@ plot_ly(x = ~Year, y = ~Percent_Vax, color = ~state, type = "scatter", mode = "l
 
 gall
 ```
+###### _Note: Hover over each line for more data. Double click in Right hand panel to view states individually._
+<br>
+<br>
 
-### Table 1. Change in Vaccination Rate From 2012 to 2020 by State
-```{r}
+#### By the numbers: Examine trends by state, year, and percent vaccination rate _change_ (from 2012 to 2020) by ordering and searching data.
+<br>
+
+### Table 1. Change in Vaccination Rate by State, 2012 to 2020
+######                                    _(Numeric values are percentages)_
+```{r, table create, echo=FALSE}
 vaxchange<-vaxdfSTATES %>% 
   filter(Year=="2012"|Year=="2020", Dimension=="≥18 Years") %>% 
   select(state, Year, Percent_Vax) %>% 
@@ -292,10 +328,14 @@ colnames(vaxchange)<- c("State", "Year: 2012", "Year: 2020", "Change")
 datatable(vaxchange, rownames = F)
 ```
 
+<br>
 
+#### _*Hawaii, Wyoming, and Maryland top the list of states with the largest increases in vaccination rates._
+<br>
+<br>
 
-
-# Look closer at increase in overall vaccination rates? Examine Age and Ethnicity as potential factors. 
+### __Additional Granularity: How do age and ethnicity affect Influenza vaccination uptake?__
+<br>
 
 
 ```{r,  data prep, include=FALSE}
@@ -315,7 +355,7 @@ vaxdtUS<-vaxdtUS[, Dimension1 := fifelse(Dimension=="≥35 Years", "35+ Years",
 #Make into a dataframe for graphs
 vaxdfUS<-as.data.frame(vaxdtUS)
 ```
-```{r}
+```{r, echo=FALSE}
 #Plotly Version, AGE
 agebar<-vaxdfUS%>%
    filter(Age_Ethn=="Age",Dimension1 !="18+ Years") %>%  
@@ -330,7 +370,14 @@ agebar<-vaxdfUS%>%
 agebar
 ```
 
-```{r}
+<br>
+
+####  _*Older women are more likely to be vaccinated against Influenza._
+####  _*This trend is consistent across the years._ 
+
+<br>
+
+```{r, echo=FALSE}
 #Plotly Version, ETHNICITY
 ethbar<-vaxdfUS%>%
    filter(Age_Ethn=="Race/Ethnicity") %>%  
@@ -343,18 +390,33 @@ ethbar<-vaxdfUS%>%
        layout(title = "Influenza Vaccination Among U.S Women by Race/Ethnic Group, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)", range=c(0,100)), legend=list(title =list(text= "<br>Race/Ethnic Group<br>")))
 
 ethbar
-
 ```
+
+<br>
+
+#### _*Women in the "other" race/ethnicity category have the highest vaccination rates as of 2020, overtaking White women in 2014._
+#### _*Black women have the lowest rates of vaccination and since 2016 rates have been trending downward._ 
+
+<br>
+<br>
+
+### By the numbers: Examining vaccination nationally (table 2) and by state (table 3) for age and race/ethnicity subpopulations.
+
+<br>
+
+###### _Note: age and rate/ethnicity data are reported separately and thus cannot be examined simultaneously. Choose which groups you would like to view using the second column, or by Search box (top right)._
+
+<br>
 
 ### Table 2. Nationwide: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020
 ```{r, create interactive table of National Data, echo=FALSE}
 #Create interactive table with DT package
-head(vaxdfSTATES)
 
 table2<-vaxdfUS %>% select(Year, Dimension, Percent_Vax) 
 colnames(table2)<- c("Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
 datatable(table2, rownames = F)
 ```
+<br>
 
 ### Table 3. By State: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020
 ```{r, create interactive table of States Data, echo=FALSE}
