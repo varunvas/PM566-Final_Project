@@ -3,7 +3,9 @@ title: "Influenza Vaccination Among Pregnant U.S. Women, 2012-2020: A Qualitativ
 author: "CB"
 output: 
    pdf_document: default
-   html_document: FALSE
+   html_document: 
+     toc: TRUE
+     toc_float: TRUE
 urlcolor: blue
 ---
 
@@ -33,7 +35,7 @@ library(plotly)
 library(DT)
 ```
 
-```{r load-data, include=FALSE}
+```{r load-data, warning=FALSE, message=FALSE, cache=TRUE, include=FALSE}
 if (!file.exists("https://raw.githubusercontent.com/CBSC73/PM566-Final_Project/main/Vaccination_Coverage_dataset.txt")) {
   download.file("https://raw.githubusercontent.com/CBSC73/PM566-Final_Project/main/Vaccination_Coverage_dataset.txt", 
                 "Vaccination_Coverage_dataset.txt", method="libcurl", timeout = 60)  
@@ -207,7 +209,7 @@ fig2020<- fig2020 %>% layout(title = paste('Influenza Vaccination Rate During Pr
 ```
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height = 5, fig.width = 5, fig.align = "center"}
 ### Plot together 
 finalfig <- subplot(fig2012, fig2020, nrows = 2) %>% 
   layout(showlegend = FALSE,
@@ -252,7 +254,7 @@ vaxdtSTATES <-vaxdtSTATES[, region := fifelse(state== "Alaska"| state=="Arizona"
                 fifelse(state=="Alabama"|state=="Arkansas"|state== "Delaware" | state=="Florida"|state== "Georgia" | state=="Kentucky" |state== "Louisiana"|state== "Maryland" | state=="Mississippi" |state=="North Carolina"|state=="Oklahoma"| state=="South Carolina"| state=="Tennessee" |state=="Texas"|state== "Virginia"|state== "West Virginia", "SOUTH",
                 fifelse(state=="Illinois"| state=="Indiana"| state=="Iowa"|state== "Kansas"| state=="Michigan"|state== "Minnesota"| state=="Missouri"| state=="Nebraska"| state=="North Dakota"| state=="Ohio"|state=="South Dakota"|state=="Wisconsin", "MIDWEST",                        "NORTHEAST")))]
 ```
-```{r, compare vaccine rates by region over time, echo=FALSE}
+```{r, compare vaccine rates by region over time, echo=FALSE, fig.height = 5, fig.width = 5, fig.align = "center"}
 vaxdfSTATES<-as.data.frame(vaxdtSTATES)
 
 vaxdfSTATES_regGraph<-vaxdfSTATES%>%filter(Dimension=="≥18 Years", Year==2012| Year==2020)
@@ -271,7 +273,7 @@ ggplotly(p)
 
 ##### States – Data was next examined at the individual state level. A line graph (Figure 3) showing each state by year reveals the two states with the lowest vaccination rate, Georgia, and Florida. Massachusetts and Iowa top the list of highest vaccinated states with 79.8% and 77.1% in 2020 respectively. Change in vaccination rate between 2012 and 2020 is examined in Table 1 by state. The states of Hawaii, Wyoming, Maryland, and New Jersey had the largest increases with 26.7, 24.2, 22.6, and 22.2 percent respectively. With 2012 rate around 40% in these states, now achieving vaccination rate above 60% represents a nearly 50% increase. 
 
-```{r, create interactive line graphs, echo=FALSE}
+```{r, create interactive line graphs, echo=FALSE, fig.height = 5, fig.width = 5, fig.align = "center"}
 
 gall<-vaxdfSTATES%>% filter(Dimension=="≥18 Years") %>% arrange(Year) %>% 
 plot_ly(x = ~Year, y = ~Percent_Vax, color = ~state, type = "scatter", mode = "lines",
@@ -285,7 +287,7 @@ gall
 
 ##### __Table 1. Change in Vaccination Rate by State, 2012 to 2020__
 ######      _(Numeric values are percentages)_ 
-```{r, table create, echo=FALSE}
+```{r, table create, echo=FALSE, fig.height = 5, fig.width = 5, fig.align = "center"}
 vaxchange<-vaxdfSTATES %>% 
   filter(Year=="2012"|Year=="2020", Dimension=="≥18 Years") %>% 
   select(state, Year, Percent_Vax) %>% 
@@ -318,7 +320,7 @@ vaxdtUS<-vaxdtUS[, Dimension1 := fifelse(Dimension=="≥35 Years", "35+ Years",
 #Make into a dataframe for graphs
 vaxdfUS<-as.data.frame(vaxdtUS)
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height = 5, fig.width = 5, fig.align = "center"}
 #Plotly Version, AGE
 
 
@@ -339,7 +341,7 @@ agebar
 ##### Ethnicity – Data was available for each of four race/ethnicity groups: “Black, non-Hispanic”, “Hispanic”, “White Non-Hispanic”, and “Other or multiple races, Non-Hispanic.” Data trends between 2012 and 2020 are demonstrated in Figure 5. Women in the Other or multiple races, non-Hispanic group had the largest increase in vaccination rate between 2012 and 2020, with a 21.3% increase (from 48.7% to 70%). This group overtook White, non-Hispanic women in 2014 and has had the highest Influenza vaccination rate since that time. White non-Hispanic women have also increased their rates by 16%, from 49.5% in 2012 to 65.5% in 2020. Black, non-Hispanic women have by far the lowest vaccination rate in all years examined. After an initial 14% increase in vaccination from 2012 to 2016 (36.1 to 50.4%), rates are decreasing among this group with a 2020 rate of 41.6%. Hispanic women are the next lowest group though have seen minimal change in yearly rate since 2015, hovering near 60%. Two interactive tables allow exploration of race/ethnicity data nationally (Table 2) and by state (Table 3).
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height = 5, fig.width = 5, fig.align = "center"}
 #Plotly Version, ETHNICITY
 ethbar<-vaxdfUS%>%
    filter(Age_Ethn=="Race/Ethnicity") %>%  
@@ -357,7 +359,7 @@ ethbar
 <br>
 
 ##### __Table 2. Nationwide: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020__
-```{r, create interactive table of National Data, echo=FALSE}
+```{r, create interactive table of National Data, echo=FALSE, fig.height = 5, fig.width = 5, fig.align = "center"}
 #Create interactive table with DT package
 
 table2<-vaxdfUS %>% select(Year, Dimension, Percent_Vax) 
@@ -366,7 +368,7 @@ datatable(table2, rownames = F)
 ```
 
 ##### __Table 3. By State: Influenza Vaccination Rate Among Pregnant U.S. Women, 2012-2020__
-```{r, create interactive table of States Data, echo=FALSE}
+```{r, create interactive table of States Data, echo=FALSE, fig.height = 5, fig.width = 5, fig.align = "center"}
 
 table3<-vaxdfSTATES %>% filter(!is.na(Percent_Vax)) %>% select(state,Year, Dimension, Percent_Vax)
 colnames(table3)<- c("State", "Year", "Age or Race/Ethnicity", "Vaccination Rate (%)")
@@ -404,7 +406,7 @@ datatable(table3, rownames = F)
 
 <br>
 
-### __References can be found here: https://github.com/CBSC73/PM566-Final_Project/blob/main/references.pdf__
+### References can be found here: https://github.com/CBSC73/PM566-Final_Project/blob/main/references.pdf
 
 
 
