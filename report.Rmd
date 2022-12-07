@@ -1,0 +1,343 @@
+---
+title: "Influenza Vaccination Among Pregnant U.S. Women, 2012-2020: A Qualitative Analysis"
+author: "CB"
+output: 
+   pdf_document: default
+   html_document: FALSE
+---
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  eval=TRUE,
+  echo = TRUE,
+  cache = FALSE,
+  fig.width = 7, 
+  fig.align = 'center',
+  fig.asp = 0.618,
+  out.width = "700px",
+options(repos = c(CRAN = "http://cran.rstudio.com")))
+```
+
+```{r, Load required libraries, include=FALSE}
+library(data.table)
+library(dplyr)
+library(tidyverse)
+library(dtplyr)
+library(knitr)
+library(ggplot2)
+library(readr)
+library(plotly)
+library(DT)
+```
+
+```{r load-data, include=FALSE}
+if (!file.exists("https://raw.githubusercontent.com/CBSC73/PM566-Final_Project/main/Vaccination_Coverage_dataset.txt")) {
+  download.file("https://raw.githubusercontent.com/CBSC73/PM566-Final_Project/main/Vaccination_Coverage_dataset.txt", 
+                "Vaccination_Coverage_dataset.txt", method="libcurl", timeout = 60)  
+}
+
+vax <- data.table::fread("Vaccination_Coverage_dataset.txt", data.table=getOption("datatable.fread.datatable", TRUE)) 
+```
+
+```{r, look at variables, include=FALSE}
+#Rename columns
+vaxdf<-as.data.frame(vax)
+vaxdf <- rename(vaxdf, Year="Survey Year/Influenza Season", Percent_Vax="Estimate (%)",Age_Ethn="Dimension Type", Geog_Type="Geography Type")
+
+#Remove duplicates
+vaxdf<-unique(vaxdf)
+dim(vaxdf)
+
+#Remove Tdap data,Puerto Rico, City of NY/Rest of NY, D.C.
+vaxdf<-vaxdf%>%filter(Vaccine=="Influenza", Geography!="District of Columbia", Geography!="NY-City of New York", Geography!="NY-Rest of state", Geography!="Puerto Rico")
+dim(vaxdf)
+
+#Make variables numeric to better evaluate them
+head(vaxdf)
+vaxdf$Percent_Vax<-as.numeric(as.character(vaxdf$Percent_Vax))
+vaxdf$Year<-as.numeric(as.character(vaxdf$Year))
+
+
+#Look for missing values
+dim(vaxdf)
+colSums(is.na(vaxdf)) #There are 267 missing values out of 2470 (10.8%)
+
+#Where are the missing values? Will check by variables of interest: Age, Race/Ethnicity, location (U.S., states)
+vaxdfage<-vaxdf %>% filter(Age_Ethn=="Age")
+vaxdfeth<-vaxdf %>% filter(Age_Ethn=="Race/Ethnicity")
+vaxdfUS<-vaxdf %>% filter(Geog_Type=="National")
+vaxdfSTATES<-vaxdf %>% filter(Geog_Type=="States")
+
+#Age
+colSums(is.na(vaxdfage)) #12 missing values out of 1244 (1%)
+dim(vaxdfage)
+
+#Ethnicity
+colSums(is.na(vaxdfeth)) #255 missing values out of 1226 (20.1%)
+dim(vaxdfeth)
+
+#National
+colSums(is.na(vaxdfUS)) #No missing values
+dim(vaxdfUS)
+
+#States
+colSums(is.na(vaxdfSTATES)) #267 missing values out of 2398 (11.1%)
+dim(vaxdfSTATES)
+
+#We can see that the vast majority of missing values are Race/Ethnicity data points in the state specific data. I only plan to examine race/ethnicity on a national level however so will not try to impute NA valu1es.
+
+```
+
+```{r, create 2012 and 2020 datasets, include=FALSE}
+
+#Create datasets 
+vaxtrim2012<-vaxdfSTATES %>% filter(Year=="2012", Dimension=="≥18 Years")
+
+vaxtrim2020<-vaxdfSTATES %>% filter(Year=="2020", Dimension=="≥18 Years")
+
+#Check each dataset for NA values
+colSums(is.na(vaxtrim2012))
+colSums(is.na(vaxtrim2020))
+#There are no missing values for Age over 18 years data in the selected years
+
+#Remove duplicates again just in case
+vaxtrim2012<-distinct(vaxtrim2012)
+vaxtrim2020<-distinct(vaxtrim2020)
+
+view(vaxtrim2012)#Only 29 states included
+view(vaxtrim2020)#Only 39 states included
+
+```
+## __Introduction__
+
+<br>
+
+### Background
+
+##### Influenza virus infection represents a significant disease burden on pregnant women and infants in the United States (1). Pregnancy and infancy (under 1 year of age) are times of relative immunosuppression and vulnerability to certain types of infection (2). Influenza virus has long been recognized as particularly virulent in pregnant women (3, 4) with an increased risk for hospitalization, ICU admission, and death (5). During the 2009 H1N1 Influenza pandemic, pregnant women had a five times higher risk of death from Influenza virus infection and associated serious morbidities (such as Staphylococcus aureus pneumonia superinfection and acute respiratory distress syndrome) than the general population (6-8). 
+
+##### Immunization during pregnancy creates IgG antibodies that cross the placenta and enter fetal circulation where they remain for approximately six months (9, 10). Breastfeeding also transmits maternal antibodies that protect newborns from infections (9). Antibodies acquired in the pre- and peri-natal periods protect babies after birth until at least 6 months of age (11). This is critical because infants are not eligible for Influenza vaccination until 6 months old (12). Indeed, infants under 6 months old have the highest rates of hospitalization related to Influenza virus infection of any age group, including older adults. Rates are estimated at 4.5 hospitalizations per 1000 children (13), which given approximately 4 million babies born each year, translates to nearly 18,000 hospitalizations. In addition to the human costs of caring for a sick infant, this represents a multi-billion-dollar burden on the medical system, especially as these infections are compressed into the December-March timeframe (“Flu season”) (47). 
+
+##### Prenatal exposure to maternal influenza infection is known to have a negative impact on long term childhood outcomes.  Indeed, vaccination against influenza during pregnancy is associated with a reduced risk of preterm birth, small for gestation age status (indicating poor fetal growth), and low birth weight (less than 2500g or 5.5 pounds) at delivery (14-16). The strong associations between the above morbidities, especially prematurity, with worse long term neurodevelopmental outcomes, is well established (17-21).  In addition to the above, several studies have found an association between Influenza infection during pregnancy (22-24), especially during the first trimester, and later development of autism spectrum disorders in offspring. Indeed, children conceived in the winter months (December-March, peak Influenza season) have a 6% increased risk of autism spectrum disorder. Similarly, schizophrenia, a devastating neuropsychological disorder that most often presents in early adulthood has been linked to first trimester prenatal influenza infection exposure with a 7-fold increased risk (25). Bipolar disorder has also been associated with prenatal Influenza infection exposure with a nearly 4-fold increased risk (26).
+
+##### The yearly influenza vaccine has a long track record of safety and efficacy during pregnancy and is recommended by the Centers for Disease Control (CDC) and American College of Obstetrics and Gynecology (ACOG) for all pregnant women (27, 28). The World Health Organization (WHO) recommends a minimum 75% vaccination rate among the population to protect those at highest risk for severe infection (29). In fact, the WHO considers pregnant women to be the highest priority Influenza vaccination group for countries initiating or extending Influenza vaccine efforts (29). It is well documented that the Influenza vaccine during pregnancy is effective, reducing proven Influenza virus infection in infants 0-6 months of age by up to 63% and in pregnant women by over 50% (11, 14). In the U.S., despite the strong recommendation by the CDC and the American College of Obstetrics to be vaccinated against Influenza, many pregnant women are not. <br> This report examines influenza vaccine rates among pregnant women in the U.S. and looks at trends over time using qualitative analyses of publicly available data.
+
+<br>
+
+### Research Questions
+
+##### The objective of this report is two-fold: 1.To determine whether the Influenza vaccination rate for pregnant women is increasing or decreasing in the U.S., and 2. Examine factors associated with low and high vaccine uptake, looking at trends over time. 
+##### Identifying those pregnant women less likely to be vaccinated can help inform where efforts to promote vaccine utilization are needed most. Conversely, identifying where vaccination rates have recently improved may provide clues about where to look for examples of successful pro-vaccination public health campaigns.
+
+<br>
+
+## __Methods__
+
+<br>
+
+##### __Study Population__: This data was acquired from the Centers for Disease Control website [view here](https://data.cdc.gov/browse?category=Pregnancy+%26+Vaccination). The study population was pregnant women 18-49 years of age, residing in the United States, who were pregnant anytime between August 1st and the survey date. Surveys were an internet panel national survey conducted at the end of Influenza Season (March-April).  Sample sizes were between 32,000-47,000 per year.
+
+<br>
+
+##### __Data Cleaning and Wrangling__: Data was downloaded directly from the CDC website as a text file with comma separated variable datapoints. The years 2012-2020 were covered and vaccination rates for Influenza as well as Tdap were included. As my interest is Influenza vaccination, Tdap data was removed. New York City, Puerto Rico and the District of Columbia were also in the dataset, however I removed these as my interest is in the 50 U.S. states. The dataset did not report data on all 50 states for all years. In 2012, only 29/50 states had data. In 2020, 39/50 states had included data. Age group and race/ethnicity data were included in the dataset, with both national and by state information. The age and race/ethnicity data were reported separated (not within each subgroup with respect to the other variable) and thus were not able to be examined simultaneously (i.e. examining age group trends by race/ethnicity).
+
+##### Missingness was examined as a whole and by variable. Overall, there were found to be 267 missing observations out of 2,470 (10.8%). Breaking this down by variable, I found that within the age group data, only 12 out of 1,244 observations were missing. As this only represented 1% of data points, these were removed.  Within the race/ethnicity data, 255 out of 1,226 observations were found to be missing (20.1%). Separating out the missing values by national versus state data, it was found that all missing values were from state specific race/ethnicity data. Given the 20% missingness rate for this subset of the data, and likely introduction of inaccuracies with attempted imputation given variability in state participation in the survey each year, I decided to only examine race/ethnicity on a national level. 
+
+##### A region variable was created using states by region specified on the CDC website (states were divided into West, Midwest, Northeast and South). Duplicate rows were examined for and removed. Summary statistics were performed to check for implausible values and none were identified.
+
+<br>
+
+##### __Software__: Data analysis was performed using “R”, an open source data analysis tool (R Core Team (2018). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria.[URL](https://www.R-project.org/)).The following R libraries were used for data wrangling, analyses, graphs, and tables: Data.Table, dplyr, tidyverse, knitr, ggplot2, readr, plotly, DT. The code behind this website and accompanying PDF is published in full on my github repository <b>[website source code](https://github.com/CBSC73/PM566-Final_Project/blob/main/index.Rmd)</b> and <b>[PDF source code](ENTER HERE)</b>
+
+<br>
+
+## __Results__
+
+<br>
+
+##### National – The Influenza vaccination rate among pregnant women in the U.S. is increasing. Despite not all states reporting for each year, a national overview between 2012 and 2020 (Figure 1) shows a clear increase over time. In 2012 the national vaccination rate for all women over the age of 18 was 47.4% (N=31, 507), and by 2020 it had increased to 61.1% (N=40, 339). This represents an increase nationally of 13.7%.
+
+##### Region - Next, Influenza vaccination rates were evaluated by region, comparing the year 2012 to the year 2020 (Figure 2). The Midwest region had the largest increase in median vaccination rate, starting at 49.1% in 2012 up to 70.95% in 2020, a nearly 22% increase. Conversely, the South had the lowest rate increase, from 43.6% in 2012 to 54.3% in 2020, a 10% change. All four U.S. regions had increased vaccine rates over time, with the Northeast having the highest rates (72.4% in 2020) and the South having the lowest (54.3% in 2020). In 2012 the vaccination rate in the Midwest region was below the Northeast and West, however in 2020 it overtook the Western region with rates close to the Northeast by 2020 (Midwest vaccine rate in 2020, 70.95%). 
+
+##### States – Data was next examined at the individual state level. A line graph (Figure 3) showing each state by year reveals the two states with the lowest vaccination rate, Georgia, and Florida. Massachusetts and Iowa top the list of highest vaccinated states with 79.8% and 77.1% in 2020 respectively. Change in vaccination rate between 2012 and 2020 is examined in Table 1 by state. The states of Hawaii, Wyoming, Maryland, and New Jersey had the largest increases with 26.7, 24.2, 22.6, and 22.2 percent respectively. With 2012 rate around 40% in these states, now achieving vaccination rate above 60% represents a nearly 50% increase. 
+
+##### Age – Data was available for each of three age groups: 18-24 years, 24-34 years, and 35 years old and above. Nationally, women 35 years and older have the highest vaccination rates and those aged 18-24 years have the lowest (Figure 4, Table 2). In terms of change over time, pregnant women 35 years and older had a 15.2% increase in vaccination rate (from 51.8% to 67%). For women ages 24-34 years, vaccination rate has been relatively constant between 2016-2020, hovering in the low 60s percent range. This is also true for the youngest age group, women 18-24 years of age who have had vaccination rates in the low 50s since 2016.  State specific data broken down by age group can be explored in Table 3 (interactive).  
+
+##### Ethnicity – Data was available for each of four race/ethnicity groups: “Black, non-Hispanic”, “Hispanic”, “White Non-Hispanic”, and “Other or multiple races, Non-Hispanic.” Data trends between 2012 and 2020 are demonstrated in Figure 5. Women in the Other or multiple races, non-Hispanic group had the largest increase in vaccination rate between 2012 and 2020, with a 21.3% increase (from 48.7% to 70%). This group overtook White, non-Hispanic women in 2014 and has had the highest Influenza vaccination rate since that time. White non-Hispanic women have also increased their rates by 16%, from 49.5% in 2012 to 65.5% in 2020. Black, non-Hispanic women have by far the lowest vaccination rate in all years examined. After an initial 14% increase in vaccination from 2012 to 2016 (36.1 to 50.4%), rates are decreasing among this group with a 2020 rate of 41.6%. Hispanic women are the next lowest group though have seen minimal change in yearly rate since 2015, hovering near 60%. Two interactive tables allow exploration of race/ethnicity data nationally (Table 2) and by state (Table 3).
+
+<br>
+
+## __Discussion__
+
+<br>
+
+##### Influenza vaccination among pregnant women is overall increasing in the United States. All four U.S. regions have higher rates in 2020 than 2012. However, there are subgroups of the population that have been slow to improve, have not made progress for many years, and are even decreasing in vaccination uptake. These are groups that would benefit from focused public health interventions.
+
+##### The Southern U.S. continues to have the lowest vaccination rate in the country. This gap has widened between 2012 and 2020, from 6 to 15 percentage points lower than the next lowest region. This is likely a multifactorial phenomenon, however two of the most influential demographic characteristics that predict vaccination status are insurance (private vs public) and level of education (30). This dataset did not address these factors directly. However, the South is the U.S. region with the lowest rates of college completion (28.2% in 2021, versus the Northeast with 34.8%) (31), and highest rates of public insurance recipients (32). Indeed, access to medical care is a known barrier to vaccination in the general adult population (33). One promising intervention is education of providers and public health interventions that target medical clinics which have been quite effective in improving vaccination rates (34-36).  Settings in which a provider can recommend and administer a vaccination at the same visit are particularly effective (34). These types of efforts, focused on the Southeast, especially Georgia and Florida have strong upward potential. These are large populous states where even a small improvement translates into many thousands of women and their children being protected.
+
+##### As women get older, they are more likely to be vaccinated against influenza during pregnancy. Older women also had the largest increase in vaccination rate between 2012 and 2020 suggesting this demographic is a primary driver of increasing vaccination rates nationally. One potential basis for these trends is the average age of a first-time mother is increasing in the U.S. It was 21 years of age in 1972 and has risen to an average age of 30 as of 2022 (37). The percentage of total pregnancies that are to older mothers has also increased while those to the youngest has decreased (37). Interestingly, a strong predictor of maternal age at first pregnancy is level of education, specifically ascertainment of a college degree (38). Education level and maternal age are inextricably linked. Finishing a four-year degree leaves most people at age 22-23 years at time of completion and the costs of post-secondary education in the U.S are rising rapidly (39). Though not looked at directly in this dataset, education is a likely primary driver of the linear relationship between age and vaccine uptake.  (For a closer look at these trends at the New York Times, featuring interactive maps on this subject, see [here](https://www.nytimes.com/interactive/2018/08/04/upshot/up-birth-age-gap.html). 
+
+##### The race/ethnicity findings in this data demonstrate significant gaps in influenza vaccination between women who identify as Hispanic or Black, non-Hispanic versus White and “Other” ethnic categories. These disparities are likely reflective of socioeconomic inequality and reduced access to healthcare and educational opportunities in the U.S. (40-41). The COVID-19 pandemic shed a stark light on the how care is not equal between racial and ethnic groups (42). Troublingly, vaccination against influenza among pregnant women who identify as Hispanic, has not changed in many years, and for those who identify as Black, rates are in fact decreasing. These trends highlight the importance of community-specific public health outreach. 
+
+<br>
+
+### __Limitations__
+
+<br>
+
+##### There are some notable weaknesses of this dataset that limit available analyses. As noted in the methods, not all 50 states are included for each year of data. This reduces generalizability of national data as some states are more represented than others. Furthermore, due to lack of reporting of certain states, region data is less representative of the true vaccine rate. For instance, California is not reported in any year. Given that approximately 12% of the U.S. population lives in California, this is a significant limitation to accuracy. When examining by region, this problem is heightened as the state represents an even larger percentage of the population for the Western region. (The California Department of Public Health tracks influenza vaccination among pregnant women in the state using the Maternal and Infant Health Assessment, a statewide survey. For further information, visit their website [here](https://www.cdph.ca.gov/Programs/CFH/DMCAH/MIHA/Pages/Data-and-Reports.aspx?Name=AnnualReport) and their [PDF report](https://www.cdph.ca.gov/Programs/CID/DCDC/CDPH%20Document%20Library/Immunization/MIHA-FactSheet2016.pdf), (see page 4, figure 4 for influenza details). The second most populous state in the U.S., and most populous Southern region state, Texas, is also missing from this dataset for all years except 2015 and 2016. 
+
+##### The reporting of age and race/ethnicity as separate vaccination rates is another limitation, as it prevents additional granularity within subgroups. For instance, it would have been illuminating to stratify data within age groups by race/ethnicity and vice versa to see in more detail the most and least vaccinated subpopulations. In addition, the race/ethnicity data by state had more than 20% of observations missing, limiting available examination of race/ethnicity trends by state and region. 
+
+##### Lastly, these data were collected by internet panel survey thus induce bias associated with self-report and recall bias which are both dataset limitations.
+
+<br>
+
+## __Conclusions & Summary__
+
+<br>
+
+##### Influenza vaccination uptake among pregnant U.S. women is increasing, reaching over 60% in 2020. Despite this positive, trend, vaccination rates remain suboptimal, well below the WHO recommended 75%. By region, the South is the least (54.3%) and Northeast the most (72.4%) vaccinated areas of the country.  Women who are younger, and identify as Hispanic or Black, non-Hispanic are less likely to receive the influenza vaccine than women over the age of 35 who identify as either White or Other, non-Hispanic ethnic group. Reasons for these observations are multifactorial, and likely represent an interplay between levels of education, access to quality prenatal and preventative health care, and racial/ethnic socioeconomic disparities in the U.S (43-46). 
+
+##### Overall, the above data indicate that efforts to increase influenza vaccine uptake in pregnant women will benefit most from community-based outreach targeting younger women who identify as Hispanic or Black, non-Hispanic in the Southern U.S.
+
+<br>
+
+### __References__
+
+<br>
+
+###### 1. Sperling RS, Riley LE; Immunization and Emerging Infections Expert Work Group. Influenza Vaccination, Pregnancy Safety, and Risk of Early Pregnancy Loss. Obstet Gynecol. 2018 May;131(5):799-802. doi: 10.1097/AOG.0000000000002573. PMID: 29630014
+
+
+###### 2. Kourtis AP, Read JS, Jamieson DJ. Pregnancy and infection. N Engl J Med. 2014 Jun 5;370(23):2211-8. doi: 10.1056/NEJMra1213566. PMID: 24897084; PMCID: PMC4459512.
+
+
+###### 3. Dodds L, McNeil SA, Fell  DB,  et al.  Impact of influenza exposure on rates of hospital admissions and physician visits because of respiratory illness among pregnant women.  CMAJ. 2007;176(4):463-468.
+
+
+######  Fell D.B., Azziz-Baumgartner E., Baker M.G., Batra M., Beaute J., Beutels P., et al. Influenza epidemiology and immunization during pregnancy: Final report of a World Health Organization working group. Vaccine. 2017;35(43):5738–5750. doi: 10.1016/j.vaccine.2017.08.037.
+
+
+###### 5. Mosby LG, Rasmussen SA, Jamieson DJ. 2009 pandemic influenza A (H1N1) in pregnancy: a systematic review of the literature. Am J Obstet Gynecol. 2011;205:10–8
+
+###### 6. Siston AM, Rasmussen SA, Honein AM, et al. Pandemic 2009 influenza A(H1N1) virus illness among pregnant women in the United States. JAMA. 2010;303:1517–25.
+
+
+######  Self WH, Wunderink RG, Williams DJ, Zhu Y, Anderson EJ, Balk RA, Fakhran SS, Chappell JD, Casimir G, Courtney DM, Trabue C, Waterer GW, Bramley A, Magill S, Jain S, Edwards KM, Grijalva CG. Staphylococcus aureus Community-acquired Pneumonia: Prevalence, Clinical Characteristics, and Outcomes. Clin Infect Dis. 2016 Aug 1;63(3):300-9. doi: 10.1093/cid/ciw300. Epub 2016 May 8. PMID: 27161775; PMCID: PMC4946021.
+
+
+###### 8. Kalil AC, Thomas PG. Influenza virus-related critical illness: pathophysiology and epidemiology. Crit Care. 2019 Jul 19;23(1):258. doi: 10.1186/s13054-019-2539-x. PMID: 31324202; PMCID: PMC6642581.
+
+
+
+###### 9. Maertens K, De Schutter S, Braeckman T, Baerts L, Van Damme P, De Meester I, Leuridan E. Breastfeeding after maternal immunisation during pregnancy: providing immunological protection to the newborn: a review. Vaccine. 2014 Apr 1;32(16):1786-92. doi: 10.1016/j.vaccine.2014.01.083. Epub 2014 Feb 13. PMID: 24530929.
+
+
+
+###### 10. Clements T, Rice TF, Vamvakas G, Barnett S, Barnes M, Donaldson B, Jones CE, Kampmann B, Holder B. Update on Transplacental Transfer of IgG Subclasses: Impact of Maternal and Fetal Factors. Front Immunol. 2020 Sep 11;11:1920. doi: 10.3389/fimmu.2020.01920. PMID: 33013843; PMCID: PMC7516031.
+
+###### 11. Zaman K, Roy E, Arifeen SE, Rahman M, Raqib R, Wilson E, Omer SB, Shahid NS, Breiman RF, Steinhoff MC. Effectiveness of maternal influenza immunization in mothers and infants. N Engl J Med 2008; 359:1555 - 64; http://dx.doi.org/10.1056/NEJMoa0708630; PMID: 18799552  
+
+###### 12.  Grohskopf LA, Alyanak E, Ferdinands JM, Broder KR, Blanton LH, Talbot HK, Fry AM. Prevention and Control of Seasonal Influenza with Vaccines: Recommendations of the Advisory Committee on Immunization Practices, United States, 2021-22 Influenza Season. MMWR Recomm Rep. 2021 Aug 27;70(5):1-28. doi: 10.15585/mmwr.rr7005a1. PMID: 34448800; PMCID: PMC8407757.
+
+###### 13. Poehling KA, Edwards KM, Weinberg GA, Szilagyi P, Staat MA, Iwane MK, Bridges CB, Grijalva CG, Zhu Y, Bernstein DI, Herrera G, Erdman D, Hall CB, Seither R, Griffin MR; New Vaccine Surveillance Network. The underrecognized burden of influenza in young children. N Engl J Med. 2006 Jul 6;355(1):31-40. doi: 10.1056/NEJMoa054869. PMID: 16822994.
+
+###### 14. Madhi S.A., Cutland C.L., Kuwanda L., Weinberg A., Hugo A., Jones S., et al. Influenza vaccination of pregnant women and protection of their infants. N Engl J Med. 2014;371(10):918–931. doi: 10.1056/NEJMoa1401480.
+
+###### 15. Omer  SB, Goodman  D, Steinhoff  MC,  et al.  Maternal influenza immunization and reduced likelihood of prematurity and small for gestational age births: a retrospective cohort study.  PLoS Med. 2011;8(5):e1000441.
+
+
+###### 16. Richards  JL, Hansen  C, Bredfeldt  C,  et al.  Neonatal outcomes after antenatal influenza immunization during the 2009 H1N1 influenza pandemic: impact on preterm birth, birth weight, and small for gestational age birth.  Clin Infect Dis. 2013;56(9):1216-1222.
+
+###### 17. Strauss RS. Adult functional outcome of those born small for gestational age: twenty-six-year follow-up of the 1970 British Birth Cohort. JAMA. 2000;283(5):625-32.
+
+
+###### 18. Leitner Y, Fattal-Valevski A, Geva R, Eshel R, Toledano-Alhadef H, Rotstein M, et al. Neurodevelopmental outcome of children with intrauterine growth retardation: a longitudinal, 10-year prospective study. J Child Neurol. 2007;22(5):580-7.
+
+
+###### 19. Jarvis S, Glinianaia SV, Torrioli MG, Platt MJ, Miceli M, Jouk PS, et al. Cerebral palsy and intrauterine growth in single births: European collaborative study. Lancet. 2003;362(9390):1106-11.
+
+###### 20. Blair EM, Nelson KB. Fetal growth restriction and risk of cerebral palsy in singletons born after at least 35 weeks' gestation. Am J Obstet Gynecol. 2015;212(4):520 e1-7.
+
+
+###### 21. Simeoni U, Armengaud JB, Siddeek B, Tolsa JF. Perinatal Origins of Adult Disease. Neonatology. 2018;113(4):393-9.
+
+
+###### 22. Zerbo  O, Iosif  AM, Delwiche  L, Walker  C, Hertz-Picciotto  I.  Month of conception and risk of autism.  Epidemiology. 2011;22(4):469-475.
+
+
+######  Atladóttir  HO, Henriksen  TB, Schendel  DE, Parner  ET.  Autism after infection, febrile episodes, and antibiotic use during pregnancy: an exploratory study.  Pediatrics. 2012;130(6):e1447-e1454.
+
+###### 24. Deykin  EY, MacMahon  B.  Viral exposure and autism.  Am J Epidemiol. 1979;109(6):628-638.
+
+###### 25. Brown AS, Begg MD, Gravenstein S, Schaefer CA, Wyatt RJ, Bresnahan M, Babulas VP, Susser ES. Serologic evidence of prenatal influenza in the etiology of schizophrenia. Arch Gen Psychiatry. 2004;61(8):774–80.
+
+
+
+###### 26. Parboosing R, Bao Y, Shen L, Schaefer CA, Brown AS. Gestational influenza and bipolar disorder in adult offspring. JAMA Psychiatry. 2013 Jul;70(7):677-85. doi: 10.1001/jamapsychiatry.2013.896. PMID: 23699867.
+
+
+
+###### 27. Grohskopf LA, Alyanak E, Ferdinands JM, Broder KR, Blanton LH, Talbot HK, Fry AM. Prevention and Control of Seasonal Influenza with Vaccines: Recommendations of the Advisory Committee on Immunization Practices, United States, 2021-22 Influenza Season. MMWR Recomm Rep. 2021 Aug 27;70(5):1-28. doi: 10.15585/mmwr.rr7005a1. PMID: 34448800; PMCID: PMC8407757.
+
+
+###### 28. ACOG Committee Opinion No. 732: Influenza Vaccination During Pregnancy. Obstet Gynecol. 2018 Apr;131(4):e109-e114. doi: 10.1097/AOG.0000000000002588. PMID: 29578985.
+
+
+###### 29. Vaccines against influenza: WHO position paper – May 2022: https://apps.who.int/iris/bitstream/handle/10665/354264/WER9719-eng-fre.pdf
+
+
+###### 30. Cambou MC, Copeland TP, Nielsen-Saines K, Macinko J. Insurance status predicts self-reported influenza vaccine coverage among pregnant women in the United States: A cross-sectional analysis of the National Health Interview Study Data from 2012 to 2018. Vaccine. 2021 Apr 8;39(15):2068-2073. doi: 10.1016/j.vaccine.2021.03.026. Epub 2021 Mar 18. PMID: 33744045; PMCID: PMC8117778.
+
+
+###### 31. Statistical Atlas, 2018, Educational Attainment in the South: <https://statisticalatlas.com/region/South/Educational-Attainment> 
+
+
+###### 32. Samantha Artiga and Elizabeth Cornachione, Trends in Medicaid and CHIP Eligibility Over Time (Washington DC: Kaiser Family Foundation, January 2016), https://www.kff.org/medicaid/report/trends-in-medicaid-and-chip-eligibility-over-time/.
+
+
+###### 33. Lu PJ, Hung MC, Srivastav A, Grohskopf LA, Kobayashi M, Harris AM, Dooling KL, Markowitz LE, Rodriguez-Lainz A, Williams WW. Surveillance of Vaccination Coverage Among Adult Populations -United States, 2018. MMWR Surveill Summ. 2021 May 14;70(3):1-26. doi: 10.15585/mmwr.ss7003a1. PMID: 33983910; PMCID: PMC8162796.
+
+
+###### 34. Wilcox C.R., Calvert A., Metz J., Kilich E., MacLeod R., Beadon K. Determinants of influenza and pertussis vaccination uptake in pregnancy: a multicenter questionnaire study of pregnant women and healthcare professionals. Pediatr Infect Dis J. 2019;38(6):625–630
+
+###### 35. Brewer NT. What Works to Increase Vaccination Uptake. Acad Pediatr. 2021 May-Jun;21(4S):S9-S16. doi: 10.1016/j.acap.2021.01.017. PMID: 33958099.
+
+
+###### 36. Wilcox C.R., Calvert A., Metz J., Kilich E., MacLeod R., Beadon K. Determinants of influenza and pertussis vaccination uptake in pregnancy: a multicenter questionnaire study of pregnant women and healthcare professionals. Pediatr Infect Dis J. 2019;38(6):625–630
+
+
+###### 37. United States Census Bureau, 2022, Stable Fertility Rates 1990-2019 Mask Distinct Variations by Age, url: https://www.census.gov/library/stories/2022/04/fertility-rates-declined-for-younger-women-increased-for-older-women.html
+
+
+###### 38. Duncan GJ, Lee KTH, Rosales-Rueda M, Kalil A. Maternal Age and Child Development. Demography. 2018 Dec;55(6):2229-2255. doi: 10.1007/s13524-018-0730-3. PMID: 30387046; PMCID: PMC6392079.
+
+
+###### 39. National Center for Education Statistics, 2022, Chapter 3: Post-Secondary Education, url: https://nces.ed.gov/programs/digest/current_tables.asp
+
+###### 40. Bryant AS, Worjoloh A, Caughey AB, Washington AE. Racial/ethnic disparities in obstetric outcomes and care: prevalence and determinants. Am J Obstet Gynecol. 2010 Apr;202(4):335-43. doi: 10.1016/j.ajog.2009.10.864. Epub 2010 Jan 12. PMID: 20060513; PMCID: PMC2847630.
+
+###### 41. Gadson A, Akpovi E, Mehta PK. Exploring the social determinants of racial/ethnic disparities in prenatal care utilization and maternal outcome. Semin Perinatol. 2017 Aug;41(5):308-317. doi: 10.1053/j.semperi.2017.04.008. Epub 2017 Jul 29. PMID: 28625554.
+
+###### 42. Mackey K, Ayers CK, Kondo KK, Saha S, Advani SM, Young S, Spencer H, Rusek M, Anderson J, Veazie S, Smith M, Kansagara D. Racial and Ethnic Disparities in COVID-19-Related Infections, Hospitalizations, and Deaths : A Systematic Review. Ann Intern Med. 2021 Mar;174(3):362-373. doi: 10.7326/M20-6306. Epub 2020 Dec 1. PMID: 33253040; PMCID: PMC7772883.
+
+###### 43. Lu MC, Halfon N.: Racial and ethnic disparities in birth outcomes: a lifecourse perspective. Maternal Child Health J 2003; 7: pp. 13-30.
+
+###### 44. David R, Collins J.: Disparities in infant mortality: What's genetics got to do with it?. Am J Public Health 2007; 97: pp. 1191-1197.
+
+
+###### 45. David R, Collins J.: Differing birth weight among infants of U.S.-born blacks, African-born blacks, and U.S.-born whites. N Engl J Med 1997; 337: pp. 1209-1214.
+
+###### 46. Petersen EE, Davis NL, Goodman D, et. al.: Vital signs: pregnancy-related deaths, United States, 2011-2015, and strategies for prevention, 13 states, 2013–2017. MMWR 2019; 68: pp. 1-7.
+
+###### 47. Rolfes MA, Foppa IM, Garg S, Flannery B, Brammer L, Singleton JA, Burns E, Jernigan D, Olsen SJ, Bresee J, Reed C. Annual estimates of the burden of seasonal influenza in the United States: A tool for strengthening influenza surveillance and preparedness. Influenza Other Respir Viruses. 2018 Jan;12(1):132-137. doi: 10.1111/irv.12486. Epub 2018 Feb 14. PMID: 29446233; PMCID: PMC5818346.
+
+
+
+
+
+
+
