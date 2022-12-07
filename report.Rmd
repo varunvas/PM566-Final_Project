@@ -3,9 +3,7 @@ title: "Influenza Vaccination Among Pregnant U.S. Women, 2012-2020: A Qualitativ
 author: "CB"
 output: 
    pdf_document: default
-   html_document: 
-     toc: TRUE
-     toc_float: TRUE
+   html_document: FALSE
 urlcolor: blue
 ---
 
