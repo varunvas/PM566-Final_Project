@@ -1,0 +1,138 @@
+---
+title: "References for: Influenza Vaccination Among Pregnant U.S. Women, 2012-2020: A Qualitative Analysis"
+author: "CB"
+output: 
+   pdf_document: default
+   html_document: FALSE
+---
+
+
+### __References__
+
+<br>
+###### 1. Sperling RS, Riley LE; Immunization and Emerging Infections Expert Work Group. Influenza Vaccination, Pregnancy Safety, and Risk of Early Pregnancy Loss. Obstet Gynecol. 2018 May;131(5):799-802. doi: 10.1097/AOG.0000000000002573. PMID: 29630014
+
+
+###### 2. Kourtis AP, Read JS, Jamieson DJ. Pregnancy and infection. N Engl J Med. 2014 Jun 5;370(23):2211-8. doi: 10.1056/NEJMra1213566. PMID: 24897084; PMCID: PMC4459512.
+
+
+###### 3. Dodds L, McNeil SA, Fell  DB,  et al.  Impact of influenza exposure on rates of hospital admissions and physician visits because of respiratory illness among pregnant women.  CMAJ. 2007;176(4):463-468.
+
+
+######  Fell D.B., Azziz-Baumgartner E., Baker M.G., Batra M., Beaute J., Beutels P., et al. Influenza epidemiology and immunization during pregnancy: Final report of a World Health Organization working group. Vaccine. 2017;35(43):5738–5750. doi: 10.1016/j.vaccine.2017.08.037.
+
+
+###### 5. Mosby LG, Rasmussen SA, Jamieson DJ. 2009 pandemic influenza A (H1N1) in pregnancy: a systematic review of the literature. Am J Obstet Gynecol. 2011;205:10–8
+
+###### 6. Siston AM, Rasmussen SA, Honein AM, et al. Pandemic 2009 influenza A(H1N1) virus illness among pregnant women in the United States. JAMA. 2010;303:1517–25.
+
+
+######  Self WH, Wunderink RG, Williams DJ, Zhu Y, Anderson EJ, Balk RA, Fakhran SS, Chappell JD, Casimir G, Courtney DM, Trabue C, Waterer GW, Bramley A, Magill S, Jain S, Edwards KM, Grijalva CG. Staphylococcus aureus Community-acquired Pneumonia: Prevalence, Clinical Characteristics, and Outcomes. Clin Infect Dis. 2016 Aug 1;63(3):300-9. doi: 10.1093/cid/ciw300. Epub 2016 May 8. PMID: 27161775; PMCID: PMC4946021.
+
+
+###### 8. Kalil AC, Thomas PG. Influenza virus-related critical illness: pathophysiology and epidemiology. Crit Care. 2019 Jul 19;23(1):258. doi: 10.1186/s13054-019-2539-x. PMID: 31324202; PMCID: PMC6642581.
+
+
+
+###### 9. Maertens K, De Schutter S, Braeckman T, Baerts L, Van Damme P, De Meester I, Leuridan E. Breastfeeding after maternal immunisation during pregnancy: providing immunological protection to the newborn: a review. Vaccine. 2014 Apr 1;32(16):1786-92. doi: 10.1016/j.vaccine.2014.01.083. Epub 2014 Feb 13. PMID: 24530929.
+
+
+
+###### 10. Clements T, Rice TF, Vamvakas G, Barnett S, Barnes M, Donaldson B, Jones CE, Kampmann B, Holder B. Update on Transplacental Transfer of IgG Subclasses: Impact of Maternal and Fetal Factors. Front Immunol. 2020 Sep 11;11:1920. doi: 10.3389/fimmu.2020.01920. PMID: 33013843; PMCID: PMC7516031.
+
+###### 11. Zaman K, Roy E, Arifeen SE, Rahman M, Raqib R, Wilson E, Omer SB, Shahid NS, Breiman RF, Steinhoff MC. Effectiveness of maternal influenza immunization in mothers and infants. N Engl J Med 2008; 359:1555 - 64; http://dx.doi.org/10.1056/NEJMoa0708630; PMID: 18799552  
+
+###### 12.  Grohskopf LA, Alyanak E, Ferdinands JM, Broder KR, Blanton LH, Talbot HK, Fry AM. Prevention and Control of Seasonal Influenza with Vaccines: Recommendations of the Advisory Committee on Immunization Practices, United States, 2021-22 Influenza Season. MMWR Recomm Rep. 2021 Aug 27;70(5):1-28. doi: 10.15585/mmwr.rr7005a1. PMID: 34448800; PMCID: PMC8407757.
+
+###### 13. Poehling KA, Edwards KM, Weinberg GA, Szilagyi P, Staat MA, Iwane MK, Bridges CB, Grijalva CG, Zhu Y, Bernstein DI, Herrera G, Erdman D, Hall CB, Seither R, Griffin MR; New Vaccine Surveillance Network. The underrecognized burden of influenza in young children. N Engl J Med. 2006 Jul 6;355(1):31-40. doi: 10.1056/NEJMoa054869. PMID: 16822994.
+
+###### 14. Madhi S.A., Cutland C.L., Kuwanda L., Weinberg A., Hugo A., Jones S., et al. Influenza vaccination of pregnant women and protection of their infants. N Engl J Med. 2014;371(10):918–931. doi: 10.1056/NEJMoa1401480.
+
+###### 15. Omer  SB, Goodman  D, Steinhoff  MC,  et al.  Maternal influenza immunization and reduced likelihood of prematurity and small for gestational age births: a retrospective cohort study.  PLoS Med. 2011;8(5):e1000441.
+
+
+###### 16. Richards  JL, Hansen  C, Bredfeldt  C,  et al.  Neonatal outcomes after antenatal influenza immunization during the 2009 H1N1 influenza pandemic: impact on preterm birth, birth weight, and small for gestational age birth.  Clin Infect Dis. 2013;56(9):1216-1222.
+
+###### 17. Strauss RS. Adult functional outcome of those born small for gestational age: twenty-six-year follow-up of the 1970 British Birth Cohort. JAMA. 2000;283(5):625-32.
+
+
+###### 18. Leitner Y, Fattal-Valevski A, Geva R, Eshel R, Toledano-Alhadef H, Rotstein M, et al. Neurodevelopmental outcome of children with intrauterine growth retardation: a longitudinal, 10-year prospective study. J Child Neurol. 2007;22(5):580-7.
+
+
+###### 19. Jarvis S, Glinianaia SV, Torrioli MG, Platt MJ, Miceli M, Jouk PS, et al. Cerebral palsy and intrauterine growth in single births: European collaborative study. Lancet. 2003;362(9390):1106-11.
+
+###### 20. Blair EM, Nelson KB. Fetal growth restriction and risk of cerebral palsy in singletons born after at least 35 weeks' gestation. Am J Obstet Gynecol. 2015;212(4):520 e1-7.
+
+
+###### 21. Simeoni U, Armengaud JB, Siddeek B, Tolsa JF. Perinatal Origins of Adult Disease. Neonatology. 2018;113(4):393-9.
+
+
+###### 22. Zerbo  O, Iosif  AM, Delwiche  L, Walker  C, Hertz-Picciotto  I.  Month of conception and risk of autism.  Epidemiology. 2011;22(4):469-475.
+
+
+######  Atladóttir  HO, Henriksen  TB, Schendel  DE, Parner  ET.  Autism after infection, febrile episodes, and antibiotic use during pregnancy: an exploratory study.  Pediatrics. 2012;130(6):e1447-e1454.
+
+###### 24. Deykin  EY, MacMahon  B.  Viral exposure and autism.  Am J Epidemiol. 1979;109(6):628-638.
+
+###### 25. Brown AS, Begg MD, Gravenstein S, Schaefer CA, Wyatt RJ, Bresnahan M, Babulas VP, Susser ES. Serologic evidence of prenatal influenza in the etiology of schizophrenia. Arch Gen Psychiatry. 2004;61(8):774–80.
+
+
+
+###### 26. Parboosing R, Bao Y, Shen L, Schaefer CA, Brown AS. Gestational influenza and bipolar disorder in adult offspring. JAMA Psychiatry. 2013 Jul;70(7):677-85. doi: 10.1001/jamapsychiatry.2013.896. PMID: 23699867.
+
+
+
+###### 27. Grohskopf LA, Alyanak E, Ferdinands JM, Broder KR, Blanton LH, Talbot HK, Fry AM. Prevention and Control of Seasonal Influenza with Vaccines: Recommendations of the Advisory Committee on Immunization Practices, United States, 2021-22 Influenza Season. MMWR Recomm Rep. 2021 Aug 27;70(5):1-28. doi: 10.15585/mmwr.rr7005a1. PMID: 34448800; PMCID: PMC8407757.
+
+
+###### 28. ACOG Committee Opinion No. 732: Influenza Vaccination During Pregnancy. Obstet Gynecol. 2018 Apr;131(4):e109-e114. doi: 10.1097/AOG.0000000000002588. PMID: 29578985.
+
+
+###### 29. Vaccines against influenza: WHO position paper – May 2022: https://apps.who.int/iris/bitstream/handle/10665/354264/WER9719-eng-fre.pdf
+
+
+###### 30. Cambou MC, Copeland TP, Nielsen-Saines K, Macinko J. Insurance status predicts self-reported influenza vaccine coverage among pregnant women in the United States: A cross-sectional analysis of the National Health Interview Study Data from 2012 to 2018. Vaccine. 2021 Apr 8;39(15):2068-2073. doi: 10.1016/j.vaccine.2021.03.026. Epub 2021 Mar 18. PMID: 33744045; PMCID: PMC8117778.
+
+
+###### 31. Statistical Atlas, 2018, Educational Attainment in the South: <https://statisticalatlas.com/region/South/Educational-Attainment> 
+
+
+###### 32. Samantha Artiga and Elizabeth Cornachione, Trends in Medicaid and CHIP Eligibility Over Time (Washington DC: Kaiser Family Foundation, January 2016), https://www.kff.org/medicaid/report/trends-in-medicaid-and-chip-eligibility-over-time/.
+
+
+###### 33. Lu PJ, Hung MC, Srivastav A, Grohskopf LA, Kobayashi M, Harris AM, Dooling KL, Markowitz LE, Rodriguez-Lainz A, Williams WW. Surveillance of Vaccination Coverage Among Adult Populations -United States, 2018. MMWR Surveill Summ. 2021 May 14;70(3):1-26. doi: 10.15585/mmwr.ss7003a1. PMID: 33983910; PMCID: PMC8162796.
+
+
+###### 34. Wilcox C.R., Calvert A., Metz J., Kilich E., MacLeod R., Beadon K. Determinants of influenza and pertussis vaccination uptake in pregnancy: a multicenter questionnaire study of pregnant women and healthcare professionals. Pediatr Infect Dis J. 2019;38(6):625–630
+
+###### 35. Brewer NT. What Works to Increase Vaccination Uptake. Acad Pediatr. 2021 May-Jun;21(4S):S9-S16. doi: 10.1016/j.acap.2021.01.017. PMID: 33958099.
+
+
+###### 36. Wilcox C.R., Calvert A., Metz J., Kilich E., MacLeod R., Beadon K. Determinants of influenza and pertussis vaccination uptake in pregnancy: a multicenter questionnaire study of pregnant women and healthcare professionals. Pediatr Infect Dis J. 2019;38(6):625–630
+
+
+###### 37. United States Census Bureau, 2022, Stable Fertility Rates 1990-2019 Mask Distinct Variations by Age, url: https://www.census.gov/library/stories/2022/04/fertility-rates-declined-for-younger-women-increased-for-older-women.html
+
+
+###### 38. Duncan GJ, Lee KTH, Rosales-Rueda M, Kalil A. Maternal Age and Child Development. Demography. 2018 Dec;55(6):2229-2255. doi: 10.1007/s13524-018-0730-3. PMID: 30387046; PMCID: PMC6392079.
+
+
+###### 39. National Center for Education Statistics, 2022, Chapter 3: Post-Secondary Education, url: https://nces.ed.gov/programs/digest/current_tables.asp
+
+###### 40. Bryant AS, Worjoloh A, Caughey AB, Washington AE. Racial/ethnic disparities in obstetric outcomes and care: prevalence and determinants. Am J Obstet Gynecol. 2010 Apr;202(4):335-43. doi: 10.1016/j.ajog.2009.10.864. Epub 2010 Jan 12. PMID: 20060513; PMCID: PMC2847630.
+
+###### 41. Gadson A, Akpovi E, Mehta PK. Exploring the social determinants of racial/ethnic disparities in prenatal care utilization and maternal outcome. Semin Perinatol. 2017 Aug;41(5):308-317. doi: 10.1053/j.semperi.2017.04.008. Epub 2017 Jul 29. PMID: 28625554.
+
+###### 42. Mackey K, Ayers CK, Kondo KK, Saha S, Advani SM, Young S, Spencer H, Rusek M, Anderson J, Veazie S, Smith M, Kansagara D. Racial and Ethnic Disparities in COVID-19-Related Infections, Hospitalizations, and Deaths : A Systematic Review. Ann Intern Med. 2021 Mar;174(3):362-373. doi: 10.7326/M20-6306. Epub 2020 Dec 1. PMID: 33253040; PMCID: PMC7772883.
+
+###### 43. Lu MC, Halfon N.: Racial and ethnic disparities in birth outcomes: a lifecourse perspective. Maternal Child Health J 2003; 7: pp. 13-30.
+
+###### 44. David R, Collins J.: Disparities in infant mortality: What's genetics got to do with it?. Am J Public Health 2007; 97: pp. 1191-1197.
+
+
+###### 45. David R, Collins J.: Differing birth weight among infants of U.S.-born blacks, African-born blacks, and U.S.-born whites. N Engl J Med 1997; 337: pp. 1209-1214.
+
+###### 46. Petersen EE, Davis NL, Goodman D, et. al.: Vital signs: pregnancy-related deaths, United States, 2011-2015, and strategies for prevention, 13 states, 2013–2017. MMWR 2019; 68: pp. 1-7.
+
+###### 47. Rolfes MA, Foppa IM, Garg S, Flannery B, Brammer L, Singleton JA, Burns E, Jernigan D, Olsen SJ, Bresee J, Reed C. Annual estimates of the burden of seasonal influenza in the United States: A tool for strengthening influenza surveillance and preparedness. Influenza Other Respir Viruses. 2018 Jan;12(1):132-137. doi: 10.1111/irv.12486. Epub 2018 Feb 14. PMID: 29446233; PMCID: PMC5818346.
+
