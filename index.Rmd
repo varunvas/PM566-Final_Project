@@ -21,7 +21,8 @@ knitr::opts_chunk$set(
 options(repos = c(CRAN = "http://cran.rstudio.com")))
 ```
 
-
+<br>
+#### Link to full report PDF[here](https://github.com/CBSC73/PM566-Final_Project/blob/main/report.pdf)
 <br>
 
 ## __Research Question__
@@ -45,26 +46,10 @@ options(repos = c(CRAN = "http://cran.rstudio.com")))
 <br>
 
 
-```{r, echo=FALSE}
-# Initialize code chunk options
-knitr::opts_chunk$set(
-  warning = FALSE,
-  message = FALSE,
-  eval=TRUE,
-  echo = TRUE,
-  cache = FALSE,
-  fig.width = 7, 
-  fig.align = 'center',
-  fig.asp = 0.618,
-  out.width = "700px")
-```
-
-
 ```{r, Load required libraries, include=FALSE}
 library(data.table)
 library(dplyr)
 library(tidyverse)
-library(leaflet)
 library(dtplyr)
 library(knitr)
 library(ggplot2)
@@ -290,7 +275,7 @@ p<-ggplot(vaxdfSTATES_regGraph,aes(y=Percent_Vax, x=region, fill = region)
   labs(title="Influenza Vaccination Rate Among Pregnant Women in the U.S. 2012 vs 2020",  y= "Vaccination Rate (%)")+
     theme(axis.text.x=element_blank(),legend.background = element_rect(color = "black")
                                         )+
-scale_fill_brewer(palette = "Purples")+
+scale_fill_brewer(palette = "Set1")+
   facet_wrap(~Year, nrow=1)
 
 ggplotly(p)
