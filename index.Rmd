@@ -22,7 +22,9 @@ options(repos = c(CRAN = "http://cran.rstudio.com")))
 ```
 
 <br>
-#### Link to full report PDF[here](https://github.com/CBSC73/PM566-Final_Project/blob/main/report.pdf)
+
+#### Link to full report PDF[here](https://github.com/CBSC73/PM566-Final_Project/blob/main/report.pdf), with references list [here](https://github.com/CBSC73/PM566-Final_Project/blob/main/references.pdf)
+
 <br>
 
 ## __Research Question__

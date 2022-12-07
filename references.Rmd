@@ -10,6 +10,7 @@ output:
 ### __References__
 
 <br>
+
 ###### 1. Sperling RS, Riley LE; Immunization and Emerging Infections Expert Work Group. Influenza Vaccination, Pregnancy Safety, and Risk of Early Pregnancy Loss. Obstet Gynecol. 2018 May;131(5):799-802. doi: 10.1097/AOG.0000000000002573. PMID: 29630014
 
 
