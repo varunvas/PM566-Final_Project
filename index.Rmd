@@ -213,7 +213,7 @@ fig2020<- fig2020 %>% layout(title = paste('Influenza Vaccination Rate During Pr
 ### Plot together 
 finalfig <- subplot(fig2012, fig2020, nrows = 2) %>% 
   layout(showlegend = FALSE,
-         title = paste('Influenza Vaccination Rate During Pregnancy by State in 2012 vs 2020'),
+         title = paste('Figure 1.Influenza Vaccination Rate During Pregnancy by State in 2012 vs 2020'),
          hovermode = TRUE
          ) %>%
   colorbar(title = "Vaccination Rate (%)", limits = c(25,85))
@@ -274,7 +274,7 @@ vaxdfSTATES_regGraph<-vaxdfSTATES%>%filter(Dimension=="≥18 Years", Year==2012|
 p<-ggplot(vaxdfSTATES_regGraph,aes(y=Percent_Vax, x=region, fill = region) 
 ) +   
   geom_boxplot(color="black")+
-  labs(title="Influenza Vaccination Rate Among Pregnant Women in the U.S. 2012 vs 2020",  y= "Vaccination Rate (%)")+
+  labs(title="Figure 2. Influenza Vaccination Rate Among Pregnant Women in the U.S. 2012 vs 2020",  y= "Vaccination Rate (%)")+
     theme(axis.text.x=element_blank(),legend.background = element_rect(color = "black")
                                         )+
 scale_fill_brewer(palette = "Set1")+
@@ -300,7 +300,7 @@ plot_ly(x = ~Year, y = ~Percent_Vax, color = ~state, type = "scatter", mode = "l
         hoverinfo = 'text',
         text = ~paste(paste(state), 
                   paste("% Vaccinated: ", Percent_Vax, sep=""), sep = "<br>")) %>% 
-       layout(title = "Influenza Vaccination Among U.S Women by State, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)"), legend=list(title =list(text= "<br>STATE<br>")))
+       layout(title = "Figure 3. Influenza Vaccination Among U.S Women by State, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)"), legend=list(title =list(text= "<br>STATE<br>")))
 
 gall
 ```
@@ -373,7 +373,7 @@ agebar<-vaxdfUS%>%
                      paste("Age:", Dimension1, sep=""),
                      paste("% Vaccinated: ", Percent_Vax, sep=""),
                      sep = "<br>"))%>% 
-         layout(title = "Influenza Vaccination Among U.S Women by Age Group, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)", range=c(0,100)), legend=list(title =list(text= "<br>Age<br>")))
+         layout(title = "Figure 4. Influenza Vaccination Among U.S Women by Age Group, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)", range=c(0,100)), legend=list(title =list(text= "<br>Age<br>")))
 
 agebar
 ```
@@ -396,7 +396,7 @@ ethbar<-vaxdfUS%>%
                      paste("Race/Ethnicity:", Dimension1, sep=""),
                      paste("% Vaccinated: ", Percent_Vax, sep=""),
                      sep = "<br>"))%>% 
-       layout(title = "Influenza Vaccination Among U.S Women by Race/Ethnic Group, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)", range=c(0,100)), legend=list(title =list(text= "<br>Race/Ethnic Group<br>")))
+       layout(title = "Figure 5. Influenza Vaccination Among U.S Women by Race/Ethnic Group, 2012-2020", plot_bgcolor='#e5ecf6', yaxis=list(title="Vaccination Rate (%)", range=c(0,100)), legend=list(title =list(text= "<br>Race/Ethnic Group<br>")))
 
 ethbar
 ```
